@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Drishti platform · ONE Maven reactor over every Java product.
+
+  Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>.
+  All rights reserved.
+
+  PROPRIETARY AND CONFIDENTIAL.
+
+  This file is the confidential and proprietary property of Ashutosh Sinha.
+  Unauthorised copying, use, modification, distribution or disclosure of this
+  file, via any medium, is strictly prohibited except with the express prior
+  written permission of the copyright holder.
+
+  See the LICENSE file in the root of this repository for the full terms.
+
+  Where it goes: <parent>/pom-reactor.xml and <parent>/.mvn/jvm.config, beside the repositories clone_all.py clones:
+
+      <parent>/drishti-tools/java    drishti-rachana/java    drishti-lake/java    drishti
+
+  Open pom-reactor.xml in IntelliJ (or run  mvn -f pom-reactor.xml clean package -DskipTests ) and the four products are one workspace.
+  Each product anchors its paths on its own root (project.rootDirectory, the nearest .mvn), so it builds the same alone and here.
+  The released exec pom.xml (one wrapper run per product) is unchanged.
+
+  <parent>/.mvn/ must carry the same two files as drishti/.mvn/ (copy them; this repository's .mvn/ is that copy):
+      jvm.config      the javac add-exports and add-opens flags the Drishti annotation processors need
+      maven.config    -Drevision=<Drishti version>: the module poms name their parent as ${revision}, which Maven reads before any pom, so only a
+                      command-line property can supply it (the property in the Drishti pom serves the root pom only). Keep it equal to drishti/.mvn/maven.config.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ash.platform</groupId>
+    <artifactId>drishti-platform-reactor</artifactId>
+    <version>1</version>
+    <packaging>pom</packaging>
+    <name>Drishti platform: one reactor</name>
+
+    <modules>
+        <module>drishti-tools/java</module>
+        <module>drishti-rachana/java</module>
+        <module>drishti-lake/java</module>
+        <module>drishti</module>
+    </modules>
+</project>
