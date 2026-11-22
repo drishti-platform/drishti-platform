@@ -1,0 +1,153 @@
+// Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>. All rights reserved.
+// Drishti platform. Proprietary: see LICENSE.
+//
+// Drishti platform index in VS Code: File, Open Workspace from File. Tasks and launch entries mirror run-configs/ (same names).
+{
+  "folders": [
+    {
+      "name": "platform",
+      "path": "."
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.debugpy",
+      "redhat.vscode-yaml"
+    ]
+  },
+  "settings": {
+    "python.defaultInterpreterPath": "python3"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Platform: clone all",
+        "type": "shell",
+        "command": "python3 clone_all.py --release i7b",
+        "windows": {
+          "command": "python clone_all.py --release i7b"
+        },
+        "options": {
+          "cwd": "${workspaceFolder:platform}"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Platform: build all",
+        "type": "shell",
+        "command": "python3 build_all.py --release i7b",
+        "windows": {
+          "command": "python build_all.py --release i7b"
+        },
+        "options": {
+          "cwd": "${workspaceFolder:platform}"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Platform: build all (skip tests)",
+        "type": "shell",
+        "command": "python3 build_all.py --release i7b --skip-tests --repo-local",
+        "windows": {
+          "command": "python build_all.py --release i7b --skip-tests --repo-local"
+        },
+        "options": {
+          "cwd": "${workspaceFolder:platform}"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Platform: make bundle",
+        "type": "shell",
+        "command": "python3 make_bundle.py --release i7b",
+        "windows": {
+          "command": "python make_bundle.py --release i7b"
+        },
+        "options": {
+          "cwd": "${workspaceFolder:platform}"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Platform: test Python",
+        "type": "shell",
+        "command": "python3 -m pytest -q tests",
+        "windows": {
+          "command": "python -m pytest -q tests"
+        },
+        "options": {
+          "cwd": "${workspaceFolder:platform}"
+        },
+        "problemMatcher": []
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Platform: clone all",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder:platform}/clone_all.py",
+        "args": [
+          "--release",
+          "i7b"
+        ],
+        "cwd": "${workspaceFolder:platform}",
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Platform: build all",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder:platform}/build_all.py",
+        "args": [
+          "--release",
+          "i7b"
+        ],
+        "cwd": "${workspaceFolder:platform}",
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Platform: build all (skip tests)",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder:platform}/build_all.py",
+        "args": [
+          "--release",
+          "i7b",
+          "--skip-tests", "--repo-local"
+        ],
+        "cwd": "${workspaceFolder:platform}",
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Platform: make bundle",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder:platform}/make_bundle.py",
+        "args": [
+          "--release",
+          "i7b"
+        ],
+        "cwd": "${workspaceFolder:platform}",
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Platform: test Python",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "pytest",
+        "args": [
+          "-q",
+          "tests"
+        ],
+        "cwd": "${workspaceFolder:platform}",
+        "console": "integratedTerminal"
+      }
+    ]
+  }
+}

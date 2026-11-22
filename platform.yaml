@@ -1,0 +1,52 @@
+# Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>. All rights reserved.
+# Drishti platform. Proprietary: see LICENSE.
+#
+# The single machine-readable source for the compatibility table and the repository URLs.
+# COMPATIBILITY.md is the readable copy of the "releases" section; clone_all.py, build_all.py and make_bundle.py read this file.
+# Subset of YAML only (nested maps, scalars, # comments): the scripts parse it with the standard library.
+#
+# url_base is the ONE field to change when the repositories move to the organisation: https://github.com/drishti-platform
+# (repository URL = url_base + "/" + the repository's "repo" value + ".git").
+url_base: https://github.com/ajsinha
+
+# Repositories in INSTALL ORDER. dir = the folder name under the parent folder; build_dir = where mvnw lives ("" = repository root;
+# "-" = nothing to build); install = jars go into ~/.m2 (or the --repo-local repository) so the next repository finds them.
+repos:
+  tools:
+    repo: drishti-tools
+    build_dir: java
+    install: true
+  rachana:
+    repo: drishti-rachana
+    build_dir: java
+    install: true
+  lake:
+    repo: drishti-lake
+    build_dir: java
+    install: true
+  elements:
+    repo: drishti-elements
+    build_dir: "-"
+    install: false
+  drishti:
+    repo: drishti
+    build_dir: ""
+    install: false
+
+# Per release: the tag (or branch) of each repository. "main" and "develop" are branches. A release marked pending names the tags
+# that will exist at the release; make_bundle.py refuses a tag that does not exist yet.
+releases:
+  i7b:
+    status: pending
+    tools: v1.1.0
+    rachana: v1.0.0
+    lake: v0.9.0
+    elements: v3.3.0
+    drishti: v2.9.11.i_7b
+  i7b-preview:
+    status: current tags, for trying the scripts
+    tools: v1.1.0
+    rachana: v0.12.0
+    lake: v0.9.0
+    elements: v3.3.0
+    drishti: main
