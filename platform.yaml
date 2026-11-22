@@ -40,13 +40,6 @@ releases:
     status: pending
     tools: v1.1.0
     rachana: v1.0.0
-    lake: v0.9.0
-    elements: v3.3.0
+    lake: v0.9.1
+    elements: v3.3.1
     drishti: v2.9.11.i_7b
-  i7b-preview:
-    status: current tags, for trying the scripts
-    tools: v1.1.0
-    rachana: v0.12.0
-    lake: v0.9.0
-    elements: v3.3.0
-    drishti: main

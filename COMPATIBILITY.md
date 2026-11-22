@@ -6,8 +6,7 @@ this table is its readable copy.
 
 | Platform release | Tools | Rachana | Lake | Elements | Drishti | Status |
 |---|---|---|---|---|---|---|
-| i7b | 1.1.0 (`v1.1.0`) | 1.0.0 (`v1.0.0`) | 0.9.x (`v0.9.0`) | 3.3.0 (`v3.3.0`) | `v2.9.11.i_7b` | pending |
-| i7b-preview | 1.1.0 | 0.12.0 (`v0.12.0`) | 0.9.0 | 3.3.0 | `main` | tags that exist today |
+| i7b | 1.1.0 (`v1.1.0`) | 1.0.0 (`v1.0.0`) | 0.9.1 (`v0.9.1`) | 3.3.1 (`v3.3.1`) | `v2.9.11.i_7b` | pending (Drishti tag after the drill) |
 
 Rules: install in the order tools, Rachana, Lake, Drishti (Elements has no Java build; Drishti vendors its bundles). A release names
 exactly one tag per repository; use `clone_all.py --release <name>` to get that set, never a mix.
