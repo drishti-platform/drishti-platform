@@ -1,19 +1,86 @@
 <!-- Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>. All rights reserved. Drishti platform. Proprietary: see LICENSE. -->
-# Drishti platform
 
-The index of the Drishti platform: what the repositories are, which versions go together, and the scripts that fetch and build
-them. No product code lives here.
+<p align="center"><img src="brand/drishti-logo.png" alt="Drishti" width="520"></p>
 
-| Repository | What it is |
-|---|---|
-| **Drishti** | the real-time risk and analytics layer: server, console, packs, engines |
-| **Rachana** | the screen grammar (Sutras), compiler and runtimes: describe a screen, supply data, get a UI |
-| **Elements** | the reusable JavaScript libraries (grid, charts, inputs, renderer) |
-| **Lake** | the storage libraries: Delta and Iceberg readers and writers, loaders |
-| **Tools** | shared Java utilities used by the others |
+<h1 align="center">The Drishti platform</h1>
 
-Drishti uses Rachana, Elements and Lake; Rachana and Lake use Tools. Versions that belong together are in
-[COMPATIBILITY.md](COMPATIBILITY.md) and [platform.yaml](platform.yaml).
+<p align="center"><b>Any data. Any domain. One grammar.</b><br>
+<i>Your data is a treasury;</i> <b>Drishti is its sentinel.</b></p>
+
+<p align="center">
+  <a href="COMPATIBILITY.md"><img alt="platform release" src="https://img.shields.io/badge/platform-i7b-1f6feb"></a>
+  <img alt="Java 21" src="https://img.shields.io/badge/Java-21-orange">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
+  <img alt="Windows | Linux | macOS" src="https://img.shields.io/badge/runs%20on-Windows%20%7C%20Linux%20%7C%20macOS-555">
+  <img alt="licence" src="https://img.shields.io/badge/licence-proprietary-lightgrey">
+</p>
+
+**The real-time risk and analytics layer that sits next to a bank's trading systems.** Drishti loads trade-grain data from the
+systems a bank already runs, aggregates it on demand for any scope, from the whole bank to an ad-hoc set of trades, and explains every
+figure: where it came from, how it was calculated and why it moved. It is not an order or execution system, and it never prices: it
+shows what its sources supply and says exactly what is missing.
+
+The platform is **five products, each useful on its own**, released separately and built in one order. This repository is their
+index: what each one is, which versions go together, and the scripts that fetch and build them all. No product code lives here.
+
+## The products
+
+<table>
+<tr>
+<td width="200" align="center"><img src="brand/drishti-logo.png" alt="Drishti" width="150"></td>
+<td><b><a href="https://github.com/ajsinha/drishti">Drishti</a></b>: <b>any data, any domain, one grammar.</b> The server, the
+console and the modules: connectors and lakes, the cluster, screens written as Sutras, the pivot and BI engines, VaR, ES, exposure and
+the pre-deal check, roles, masks, four eyes and an audit trail.</td>
+</tr>
+<tr>
+<td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/drishti_rachana-logo.svg"><img src="brand/drishti_rachana-logo-light.svg" alt="Drishti Rachana" width="170"></picture></td>
+<td><b><a href="https://github.com/ajsinha/drishti-rachana">Drishti Rachana</a></b>: <b>describe a screen, supply the data, get a fast,
+professional UI.</b> <i>Screens become assembly, not writing.</i> The Sutra language, its compiler (Java, JavaScript, Python),
+fragment libraries, live tables, the Data Protocol, a standalone server and Studio.</td>
+</tr>
+<tr>
+<td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/drishti_elements-logo-light.svg"><img src="brand/drishti_elements-logo.svg" alt="Drishti Elements" height="48"></picture></td>
+<td><b><a href="https://github.com/ajsinha/drishti-elements">Drishti Elements</a></b>: plain JavaScript libraries for data-heavy
+screens: a grid with a pivot, charts and maps, inputs and forms, live updates and the painter that draws a Sutra. No framework, strict
+CSP, vendored, never from a CDN.</td>
+</tr>
+<tr>
+<td align="center"><h3>Drishti Lake</h3></td>
+<td><b><a href="https://github.com/ajsinha/drishti-lake">Drishti Lake</a></b>: <b>Delta, Iceberg and plain files, loaded and read
+as one lake.</b> One storage API proven feature-identical across stores (local, memory, S3), one loader in Java and Python with
+guards, <code>lake maintain</code>, data contracts, fully Databricks Delta compliant.</td>
+</tr>
+<tr>
+<td align="center"><h3>Drishti Tools</h3></td>
+<td><b><a href="https://github.com/ajsinha/drishti-tools">Drishti Tools</a></b>: <b>shared, domain-free Java utilities for the
+Drishti family.</b> Settings, networking, concurrency, time, one xlsx writer, codecs, CSV, files, a test kit and a BOM, so every
+product fixes a bug in one place.</td>
+</tr>
+</table>
+
+## How they fit
+
+```mermaid
+flowchart LR
+  T[Drishti Tools] --> R[Drishti Rachana]
+  T --> L[Drishti Lake]
+  E[Drishti Elements] -. vendored .-> R
+  R --> D[Drishti]
+  L --> D
+  E -. vendored .-> D
+```
+
+Rachana and Lake build on Tools; Drishti builds on Rachana and Lake and vendors Elements' bundles (Elements has no Java build). The
+versions that belong together are in [COMPATIBILITY.md](COMPATIBILITY.md); the machine-readable source is
+[platform.yaml](platform.yaml).
+
+## Principles
+
+- **Lean and streamlined:** one implementation of each job, one grammar for every expression, one storage API, one set of screen
+  libraries.
+- **Accuracy first:** every risk number is computed on the server and proven by goldens on every change.
+- **Standards, not workarounds:** data stays 100% Delta and Iceberg compliant, read and written through the official libraries.
+- **Plain to run:** Java 21 and Python only, on Windows, Linux and macOS; nothing to install from a CDN, no native executables.
 
 ## Install order
 
