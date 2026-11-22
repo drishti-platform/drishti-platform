@@ -23,6 +23,12 @@ shows what its sources supply and says exactly what is missing.
 The platform is **five products, each useful on its own**, released separately and built in one order. This repository is their
 index: what each one is, which versions go together, and the scripts that fetch and build them all. No product code lives here.
 
+> **Getting the code.** GitHub's green **Code → Download ZIP** on this page gives **only this index** (the scripts and this
+> README), not the products. For **everything in one download**, open **[Releases](https://github.com/drishti-platform/drishti-platform/releases)**
+> and download **`drishti-platform-<release>-source.zip`**: every product's source at its release tag, plus `build_all.py` and checksums.
+> Unzip it and run `python build_all.py --bundle .` (needs JDK 21 and Python 3.10+, nothing else). With git installed you can instead run
+> `python clone_all.py --release <release>` from this index.
+
 ## The products
 
 <table>
