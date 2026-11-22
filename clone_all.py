@@ -9,6 +9,7 @@ Python 3.10+, git on the PATH. Works on Windows and Linux.
 from __future__ import annotations
 
 import argparse
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -42,6 +43,14 @@ def clone_or_update(cfg: dict, name: str, ref: str, parent: Path, dry: bool) -> 
     return folder
 
 
+def place_pom(parent: Path, dry_run: bool) -> None:
+    """The platform pom.xml beside the repositories: `mvn` in the parent folder builds tools, Rachana, Lake and Drishti in order."""
+    src = Path(__file__).resolve().parent / "pom.xml"
+    print(f"  copy {src} -> {parent / 'pom.xml'}")
+    if not dry_run:
+        shutil.copyfile(src, parent / "pom.xml")
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--release", help="a release name from platform.yaml")
@@ -56,6 +65,7 @@ def main(argv: list[str] | None = None) -> int:
             a.parent.mkdir(parents=True, exist_ok=True)
         for name, ref in refs.items():
             clone_or_update(cfg, name, ref, a.parent, a.dry_run)
+        place_pom(a.parent, a.dry_run)
     except pl.PlatformError as e:
         return pl.fail(e)
     print("done")

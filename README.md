@@ -113,6 +113,11 @@ python build_all.py --release i7b --repo-local --skip-tests   # dedicated Maven 
 `--parent <folder>` changes the parent folder (default: the folder above this repository). Each library is built with its own
 `mvnw` / `mvnw.cmd`.
 
+**Or with Maven alone:** `clone_all.py` also puts `pom.xml` in the parent folder (it is in the source zip too, and attached to each
+release). In the parent folder, `mvn` builds tools, Rachana, Lake and Drishti in that order, each with its own wrapper in its own folder
+(the default goals are `clean install`; `mvn -Dgoals="clean install -DskipTests"` for a quick build). It stops at the first product
+that fails.
+
 ## Source bundle
 
 `python make_bundle.py --release i7b` writes `drishti-platform-i7b-source.zip`: every repository's source at its tag (`git archive`),

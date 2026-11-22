@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Drishti platform · one command builds every Java product, in dependency order.
+
+  Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>.
+  All rights reserved.
+
+  PROPRIETARY AND CONFIDENTIAL.
+
+  This file is the confidential and proprietary property of Ashutosh Sinha.
+  Unauthorised copying, use, modification, distribution or disclosure of this
+  file, via any medium, is strictly prohibited except with the express prior
+  written permission of the copyright holder.
+
+  See the LICENSE file in the root of this repository for the full terms.
+
+  Where it goes: clone_all.py copies this file into the parent folder, beside the repositories it clones:
+
+      <parent>/pom.xml              this file
+      <parent>/drishti-tools/       tools      1st (everything else uses it)
+      <parent>/drishti-rachana/     Rachana    2nd (needs tools)
+      <parent>/drishti-lake/        Lake       3rd (needs tools)
+      <parent>/drishti/             Drishti    last (needs all three; vendors Elements' bundles, which have no Java build)
+
+  In the parent folder:
+      mvn                                    the default: clean install, every product in order (installs into your ~/.m2)
+      mvn -Dgoals="clean install -DskipTests"   a quick build
+      mvn -Dgoals="clean verify"             build and test, install nothing (each product then needs the one before it in ~/.m2)
+
+  Each product is built by its own Maven wrapper in its own folder, exactly as it is built on its own and in the drill: this file
+  only runs them one after another and stops at the first that fails. A product's settings (its .mvn folder) stay its own.
+  build_all.py does the same plus Elements and the Python checks.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ash.platform</groupId>
+    <artifactId>drishti-platform</artifactId>
+    <version>1</version>
+    <packaging>pom</packaging>
+    <name>Drishti platform: every Java product, in order</name>
+
+    <properties>
+        <goals>clean install</goals>
+        <mvnw>./mvnw</mvnw>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation><os><family>windows</family></os></activation>
+            <properties><mvnw>mvnw.cmd</mvnw></properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <defaultGoal>validate</defaultGoal>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.6.3</version>
+                <executions>
+                    <execution>
+                        <id>1-tools</id>
+                        <phase>validate</phase>
+                        <goals><goal>exec</goal></goals>
+                        <configuration>
+                            <workingDirectory>${project.basedir}/drishti-tools/java</workingDirectory>
+                            <executable>${project.basedir}/drishti-tools/java/${mvnw}</executable>
+                            <commandlineArgs>-B ${goals}</commandlineArgs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>2-rachana</id>
+                        <phase>validate</phase>
+                        <goals><goal>exec</goal></goals>
+                        <configuration>
+                            <workingDirectory>${project.basedir}/drishti-rachana/java</workingDirectory>
+                            <executable>${project.basedir}/drishti-rachana/java/${mvnw}</executable>
+                            <commandlineArgs>-B ${goals}</commandlineArgs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>3-lake</id>
+                        <phase>validate</phase>
+                        <goals><goal>exec</goal></goals>
+                        <configuration>
+                            <workingDirectory>${project.basedir}/drishti-lake/java</workingDirectory>
+                            <executable>${project.basedir}/drishti-lake/java/${mvnw}</executable>
+                            <commandlineArgs>-B ${goals}</commandlineArgs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>4-drishti</id>
+                        <phase>validate</phase>
+                        <goals><goal>exec</goal></goals>
+                        <configuration>
+                            <workingDirectory>${project.basedir}/drishti</workingDirectory>
+                            <executable>${project.basedir}/drishti/${mvnw}</executable>
+                            <commandlineArgs>-B ${goals}</commandlineArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
