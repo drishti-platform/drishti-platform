@@ -34,31 +34,31 @@ index: what each one is, which versions go together, and the scripts that fetch 
 <table>
 <tr>
 <td width="200" align="center"><img src="brand/drishti-logo.png" alt="Drishti" width="150"></td>
-<td><b><a href="https://github.com/ajsinha/drishti">Drishti</a></b>: <b>any data, any domain, one grammar.</b> The server, the
+<td><b><a href="https://github.com/drishti-platform/drishti">Drishti</a></b>: <b>any data, any domain, one grammar.</b> The server, the
 console and the modules: connectors and lakes, the cluster, screens written as Sutras, the pivot and BI engines, VaR, ES, exposure and
 the pre-deal check, roles, masks, four eyes and an audit trail.</td>
 </tr>
 <tr>
 <td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/drishti_rachana-logo.svg"><img src="brand/drishti_rachana-logo-light.svg" alt="Drishti Rachana" width="170"></picture></td>
-<td><b><a href="https://github.com/ajsinha/drishti-rachana">Drishti Rachana</a></b>: <b>describe a screen, supply the data, get a fast,
+<td><b><a href="https://github.com/drishti-platform/drishti-rachana">Drishti Rachana</a></b>: <b>describe a screen, supply the data, get a fast,
 professional UI.</b> <i>Screens become assembly, not writing.</i> The Sutra language, its compiler (Java, JavaScript, Python),
 fragment libraries, live tables, the Data Protocol, a standalone server and Studio.</td>
 </tr>
 <tr>
 <td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/drishti_elements-logo-light.svg"><img src="brand/drishti_elements-logo.svg" alt="Drishti Elements" height="48"></picture></td>
-<td><b><a href="https://github.com/ajsinha/drishti-elements">Drishti Elements</a></b>: plain JavaScript libraries for data-heavy
+<td><b><a href="https://github.com/drishti-platform/drishti-elements">Drishti Elements</a></b>: plain JavaScript libraries for data-heavy
 screens: a grid with a pivot, charts and maps, inputs and forms, live updates and the painter that draws a Sutra. No framework, strict
 CSP, vendored, never from a CDN.</td>
 </tr>
 <tr>
 <td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/drishti_lake-logo.svg"><img src="brand/drishti_lake-logo-light.svg" alt="Drishti Lake" width="170"></picture></td>
-<td><b><a href="https://github.com/ajsinha/drishti-lake">Drishti Lake</a></b>: <b>One lake. Every store.</b> Delta, Iceberg and plain files, loaded
+<td><b><a href="https://github.com/drishti-platform/drishti-lake">Drishti Lake</a></b>: <b>One lake. Every store.</b> Delta, Iceberg and plain files, loaded
 and read as one lake. One storage API proven feature-identical across stores (local, memory, S3), one loader in Java and Python with
 guards, <code>lake maintain</code>, data contracts, fully Databricks Delta compliant.</td>
 </tr>
 <tr>
 <td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/drishti_tools-logo.svg"><img src="brand/drishti_tools-logo-light.svg" alt="Drishti Tools" width="170"></picture></td>
-<td><b><a href="https://github.com/ajsinha/drishti-tools">Drishti Tools</a></b>: <b>Fix it once. Use it everywhere.</b> Shared, domain-free
+<td><b><a href="https://github.com/drishti-platform/drishti-tools">Drishti Tools</a></b>: <b>Fix it once. Use it everywhere.</b> Shared, domain-free
 Java utilities for the Drishti family. Settings, networking, concurrency, time, one xlsx writer, codecs, CSV, files, a test kit and a BOM, so every
 product fixes a bug in one place.</td>
 </tr>

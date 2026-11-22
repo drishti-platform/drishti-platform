@@ -7,7 +7,7 @@
 #
 # url_base is the ONE field to change when the repositories move to the organisation: https://github.com/drishti-platform
 # (repository URL = url_base + "/" + the repository's "repo" value + ".git").
-url_base: https://github.com/ajsinha
+url_base: https://github.com/drishti-platform
 
 # Repositories in INSTALL ORDER. dir = the folder name under the parent folder; build_dir = where mvnw lives ("" = repository root;
 # "-" = nothing to build); install = jars go into ~/.m2 (or the --repo-local repository) so the next repository finds them.
