@@ -45,15 +45,15 @@ screens: a grid with a pivot, charts and maps, inputs and forms, live updates an
 CSP, vendored, never from a CDN.</td>
 </tr>
 <tr>
-<td align="center"><h3>Drishti Lake</h3></td>
-<td><b><a href="https://github.com/ajsinha/drishti-lake">Drishti Lake</a></b>: <b>Delta, Iceberg and plain files, loaded and read
-as one lake.</b> One storage API proven feature-identical across stores (local, memory, S3), one loader in Java and Python with
+<td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/drishti_lake-logo.svg"><img src="brand/drishti_lake-logo-light.svg" alt="Drishti Lake" width="170"></picture></td>
+<td><b><a href="https://github.com/ajsinha/drishti-lake">Drishti Lake</a></b>: <b>One lake. Every store.</b> Delta, Iceberg and plain files, loaded
+and read as one lake. One storage API proven feature-identical across stores (local, memory, S3), one loader in Java and Python with
 guards, <code>lake maintain</code>, data contracts, fully Databricks Delta compliant.</td>
 </tr>
 <tr>
-<td align="center"><h3>Drishti Tools</h3></td>
-<td><b><a href="https://github.com/ajsinha/drishti-tools">Drishti Tools</a></b>: <b>shared, domain-free Java utilities for the
-Drishti family.</b> Settings, networking, concurrency, time, one xlsx writer, codecs, CSV, files, a test kit and a BOM, so every
+<td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/drishti_tools-logo.svg"><img src="brand/drishti_tools-logo-light.svg" alt="Drishti Tools" width="170"></picture></td>
+<td><b><a href="https://github.com/ajsinha/drishti-tools">Drishti Tools</a></b>: <b>Fix it once. Use it everywhere.</b> Shared, domain-free
+Java utilities for the Drishti family. Settings, networking, concurrency, time, one xlsx writer, codecs, CSV, files, a test kit and a BOM, so every
 product fixes a bug in one place.</td>
 </tr>
 </table>
