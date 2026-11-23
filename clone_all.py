@@ -50,6 +50,7 @@ def place_pom(parent: Path, dry_run: bool) -> None:
     print(f"  copy {src} -> {parent / 'pom.xml'}")
     if not dry_run:
         shutil.copyfile(src, parent / "pom.xml")
+        shutil.copyfile(src.parent / "IDE_GUIDE.md", parent / "IDE_GUIDE.md")
     launchers = Path(__file__).resolve().parent / "parent-run-configs"
     for f in sorted(launchers.glob("*.run.xml")):
         print(f"  copy {f} -> {parent / 'run-configs' / f.name}")

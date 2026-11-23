@@ -119,7 +119,7 @@ release). In the parent folder, `mvn` builds tools, Rachana, Lake and Drishti in
 the pom trusts the Windows certificate store for the product builds (`-Djavax.net.ssl.trustStoreType=Windows-ROOT`), so a corporate
 proxy's root certificate is accepted.
 
-**In IntelliJ IDEA:** open the parent folder's `pom.xml` as the project; the launchers are in the parent folder's `run-configs/`:
+**In IntelliJ IDEA and PyCharm:** [IDE_GUIDE.md](IDE_GUIDE.md) takes a fresh machine from the release zip to a running server and console with nothing to edit by hand (also at the top of the zip, and placed beside `pom.xml` by `clone_all.py`). The launchers are in the parent folder's `run-configs/`:
 
 | Launcher | What it runs |
 |---|---|

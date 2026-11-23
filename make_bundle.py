@@ -20,7 +20,7 @@ from pathlib import Path
 
 import platform_lib as pl
 
-TOP_FILES = ["README.md", "COMPATIBILITY.md", "platform.yaml", "platform_lib.py", "build_all.py", "pom.xml", "LICENSE"]
+TOP_FILES = ["README.md", "COMPATIBILITY.md", "platform.yaml", "platform_lib.py", "build_all.py", "pom.xml", "IDE_GUIDE.md", "LICENSE"]
 
 
 def archive(folder: Path, ref: str) -> bytes:
@@ -33,9 +33,11 @@ def archive(folder: Path, ref: str) -> bytes:
     return out.stdout
 
 
-def lake_wheel(cfg: dict, refs: dict, parent: Path) -> tuple[str, bytes]:
+def lake_wheel(cfg: dict, refs: dict, parent: Path) -> tuple[str, bytes] | None:
     """Drishti's pinned Lake wheel (drishti/lib/lake-wheel.pin: ref, version, sha256), built from the Lake checkout at the release tag
     (uv build is reproducible) and checked against the pin, so the unzipped bundle runs the console with no build step of its own."""
+    if "drishti" not in refs or "lake" not in refs:                         # a release without both has no wheel to carry
+        return None
     drishti = parent / cfg["repos"]["drishti"]["repo"]
     pin = dict(l.split("=", 1) for l in subprocess.run(["git", "show", f"{refs['drishti']}:lib/lake-wheel.pin"], cwd=drishti,
                capture_output=True, text=True, check=True).stdout.splitlines() if l and not l.startswith("#") and "=" in l)
@@ -82,8 +84,9 @@ def build(cfg: dict, release: str, parent: Path, out_dir: Path) -> Path:
             put(f, (pl.HERE / f).read_bytes())
         for f in sorted((pl.HERE / "parent-run-configs").glob("*.run.xml")):   # the IntelliJ launchers, beside the pom
             put("run-configs/" + f.name, f.read_bytes())
-        name, data = lake_wheel(cfg, refs, parent)                            # the pinned Lake Python wheel, where Drishti looks for it
-        put(name, data)
+        wheel = lake_wheel(cfg, refs, parent)                                 # the pinned Lake Python wheel, where Drishti looks for it
+        if wheel:
+            put(*wheel)
         z.writestr("SHA-256SUMS", "".join(f"{h}  {n}\n" for h, n in sorted(sums, key=lambda s: s[1])))
     return target
 
