@@ -59,6 +59,8 @@
         <!-- the Python the product builds start (Rachana's build helpers read -Dpython3); on Windows the profile below uses the
              Python launcher `py`, because `python3`/`python` there is often the Microsoft Store stub, not the installed Python -->
         <platform.python></platform.python>
+        <!-- every product build also gets -Dspotless.check.skip=true: the code-format check is a developer gate (the drills run it); a
+             source zip on Windows has no git, so the check would expect CRLF line endings and refuse the release's LF files -->
     </properties>
 
     <profiles>
@@ -88,7 +90,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-tools/java</workingDirectory>
                             <executable>${project.basedir}/drishti-tools/java/${mvnw}</executable>
-                            <commandlineArgs>-B ${platform.trust} ${platform.python} -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} ${platform.python} -Dspotless.check.skip=true -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -98,7 +100,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-rachana/java</workingDirectory>
                             <executable>${project.basedir}/drishti-rachana/java/${mvnw}</executable>
-                            <commandlineArgs>-B ${platform.trust} ${platform.python} -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} ${platform.python} -Dspotless.check.skip=true -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -108,7 +110,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-lake/java</workingDirectory>
                             <executable>${project.basedir}/drishti-lake/java/${mvnw}</executable>
-                            <commandlineArgs>-B ${platform.trust} ${platform.python} -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} ${platform.python} -Dspotless.check.skip=true -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -118,7 +120,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti</workingDirectory>
                             <executable>${project.basedir}/drishti/${mvnw}</executable>
-                            <commandlineArgs>-B ${platform.trust} ${platform.python} -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} ${platform.python} -Dspotless.check.skip=true -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>
