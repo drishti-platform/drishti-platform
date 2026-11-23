@@ -30,6 +30,12 @@
   Each product is built by its own Maven wrapper in its own folder, exactly as it is built on its own and in the drill: this file
   only runs them one after another and stops at the first that fails. A product's settings (its .mvn folder) stay its own.
   build_all.py does the same plus Elements and the Python checks.
+
+  IntelliJ: the launchers in run-configs/ (placed beside this file by clone_all.py, and in the source zip):
+      platform-clean-install                    Windows: clean install of all four, no tests, trusting the Windows certificate store
+      platform-clean-install (Linux, macOS)     the same without the Windows option
+  The outer Maven (the one IntelliJ runs) needs the Windows option in its own JVM, which is why the Windows launcher sets it as a VM
+  option; this pom passes it on to the four product builds itself.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -47,13 +53,19 @@
         <!-- IntelliJ's "Skip Tests" toggle and mvn -DskipTests set this; it is passed on to every product's own build -->
         <skipTests>false</skipTests>
         <mvnw>./mvnw</mvnw>
+        <!-- JVM options for every product's build; on Windows the profile below trusts the Windows certificate store
+             (a corporate proxy's root is there), so Maven Central is reached; -Dplatform.trust= turns it off -->
+        <platform.trust></platform.trust>
     </properties>
 
     <profiles>
         <profile>
             <id>windows</id>
             <activation><os><family>windows</family></os></activation>
-            <properties><mvnw>mvnw.cmd</mvnw></properties>
+            <properties>
+                <mvnw>mvnw.cmd</mvnw>
+                <platform.trust>-Djavax.net.ssl.trustStoreType=Windows-ROOT</platform.trust>
+            </properties>
         </profile>
     </profiles>
 
@@ -72,7 +84,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-tools/java</workingDirectory>
                             <executable>${project.basedir}/drishti-tools/java/${mvnw}</executable>
-                            <commandlineArgs>-B -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -82,7 +94,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-rachana/java</workingDirectory>
                             <executable>${project.basedir}/drishti-rachana/java/${mvnw}</executable>
-                            <commandlineArgs>-B -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -92,7 +104,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-lake/java</workingDirectory>
                             <executable>${project.basedir}/drishti-lake/java/${mvnw}</executable>
-                            <commandlineArgs>-B -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -102,7 +114,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti</workingDirectory>
                             <executable>${project.basedir}/drishti/${mvnw}</executable>
-                            <commandlineArgs>-B -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>

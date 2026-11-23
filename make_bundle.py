@@ -14,6 +14,7 @@ import io
 import subprocess
 import sys
 import tarfile
+import tempfile
 import zipfile
 from pathlib import Path
 
@@ -30,6 +31,28 @@ def archive(folder: Path, ref: str) -> bytes:
     if out.returncode != 0:
         raise pl.PlatformError(f"git archive failed in {folder}: {out.stderr.decode(errors='replace')}")
     return out.stdout
+
+
+def lake_wheel(cfg: dict, refs: dict, parent: Path) -> tuple[str, bytes]:
+    """Drishti's pinned Lake wheel (drishti/lib/lake-wheel.pin: ref, version, sha256), built from the Lake checkout at the release tag
+    (uv build is reproducible) and checked against the pin, so the unzipped bundle runs the console with no build step of its own."""
+    drishti = parent / cfg["repos"]["drishti"]["repo"]
+    pin = dict(l.split("=", 1) for l in subprocess.run(["git", "show", f"{refs['drishti']}:lib/lake-wheel.pin"], cwd=drishti,
+               capture_output=True, text=True, check=True).stdout.splitlines() if l and not l.startswith("#") and "=" in l)
+    lake = parent / cfg["repos"]["lake"]["repo"]
+    with tempfile.TemporaryDirectory() as tmp:
+        src = Path(tmp) / "lake"
+        with tarfile.open(fileobj=io.BytesIO(archive(lake, pin["ref"]))) as tar:
+            tar.extractall(src, filter="data")
+        out = Path(tmp) / "wheels"
+        r = subprocess.run(["uv", "build", "--wheel", str(src / "python"), "--out-dir", str(out)], capture_output=True, text=True)
+        if r.returncode != 0:
+            raise pl.PlatformError(f"the Lake wheel did not build (uv build): {r.stderr.strip()[-400:]}")
+        wheel = out / f"drishti_lake-{pin['version']}-py3-none-any.whl"
+        data = wheel.read_bytes()
+    if hashlib.sha256(data).hexdigest() != pin["sha256"]:
+        raise pl.PlatformError(f"the Lake wheel built from {pin['ref']} is not the one Drishti pins (sha256 {pin['sha256']})")
+    return f"{cfg['repos']['drishti']['repo']}/lib/wheels/{wheel.name}", data
 
 
 def build(cfg: dict, release: str, parent: Path, out_dir: Path) -> Path:
@@ -57,6 +80,10 @@ def build(cfg: dict, release: str, parent: Path, out_dir: Path) -> Path:
                     put(prefix + m.name, tar.extractfile(m).read(), m.mode)
         for f in TOP_FILES:
             put(f, (pl.HERE / f).read_bytes())
+        for f in sorted((pl.HERE / "parent-run-configs").glob("*.run.xml")):   # the IntelliJ launchers, beside the pom
+            put("run-configs/" + f.name, f.read_bytes())
+        name, data = lake_wheel(cfg, refs, parent)                            # the pinned Lake Python wheel, where Drishti looks for it
+        put(name, data)
         z.writestr("SHA-256SUMS", "".join(f"{h}  {n}\n" for h, n in sorted(sums, key=lambda s: s[1])))
     return target
 

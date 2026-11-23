@@ -25,7 +25,7 @@ index: what each one is, which versions go together, and the scripts that fetch 
 
 > **Getting the code.** GitHub's green **Code → Download ZIP** on this page gives **only this index** (the scripts and this
 > README), not the products. For **everything in one download**, open **[Releases](https://github.com/drishti-platform/drishti-platform/releases)**
-> and download **`drishti-platform-<release>-source.zip`**: every product's source at its release tag, plus `build_all.py` and checksums.
+> and download **`drishti-platform-<release>-source.zip`**: every product's source at its release tag, the platform `pom.xml` and its IntelliJ launchers (`run-configs/`), Drishti's pinned Lake Python wheel already in `drishti/lib/wheels/`, `build_all.py` and checksums.
 > Unzip it and run `python build_all.py --bundle .` (needs JDK 21 and Python 3.10+, nothing else). With git installed you can instead run
 > `python clone_all.py --release <release>` from this index.
 
@@ -115,8 +115,19 @@ python build_all.py --release i7b --repo-local --skip-tests   # dedicated Maven 
 
 **Or with Maven alone:** `clone_all.py` also puts `pom.xml` in the parent folder (it is in the source zip too, and attached to each
 release). In the parent folder, `mvn` builds tools, Rachana, Lake and Drishti in that order, each with its own wrapper in its own folder
-(the default goals are `clean install`; `mvn -Dgoals="clean install -DskipTests"` for a quick build). It stops at the first product
-that fails.
+(the default goals are `clean install`; `mvn -DskipTests` for a quick build). It stops at the first product that fails. On Windows
+the pom trusts the Windows certificate store for the product builds (`-Djavax.net.ssl.trustStoreType=Windows-ROOT`), so a corporate
+proxy's root certificate is accepted.
+
+**In IntelliJ IDEA:** open the parent folder's `pom.xml` as the project; the launchers are in the parent folder's `run-configs/`:
+
+| Launcher | What it runs |
+|---|---|
+| `platform-clean-install` | Windows: clean install of tools, Rachana, Lake and Drishti, no tests; the Windows certificate store trusted by IntelliJ's Maven too (VM option) |
+| `platform-clean-install (Linux, macOS)` | the same without the Windows option |
+
+Set the project SDK to a JDK 21 first (File → Project Structure → Project). The project only builds; open each product as its own
+project to work on its code.
 
 ## Source bundle
 

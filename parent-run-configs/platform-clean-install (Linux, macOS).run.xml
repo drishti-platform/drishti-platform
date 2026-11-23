@@ -1,0 +1,58 @@
+<!--
+  Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>. All rights reserved.
+  Drishti platform. Proprietary: see LICENSE.
+
+  platform-clean-install (Linux, macOS): Linux and macOS. Builds and installs every product without tests.
+  Placed in <parent>/run-configs/ by clone_all.py (and in the source zip). Open <parent>/pom.xml in IntelliJ as the project; the
+  launcher runs the platform pom: clean install of tools, Rachana, Lake and Drishti, in that order, tests skipped.
+-->
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="platform-clean-install (Linux, macOS)" type="MavenRunConfiguration" factoryName="Maven">
+    <MavenSettings>
+      <option name="myGeneralSettings" />
+      <option name="myRunnerSettings">
+        <MavenRunnerSettings>
+          <option name="delegateBuildToMaven" value="false" />
+          <option name="environmentProperties">
+            <map />
+          </option>
+          <option name="jreName" value="#USE_PROJECT_JDK" />
+          <option name="mavenProperties">
+            <map>
+              <entry key="goals" value="clean install" />
+              <entry key="skipTests" value="true" />
+            </map>
+          </option>
+          <option name="passParentEnv" value="true" />
+          <option name="runMavenInBackground" value="true" />
+          <option name="skipTests" value="true" />
+          <option name="vmOptions" value="" />
+        </MavenRunnerSettings>
+      </option>
+      <option name="myRunnerParameters">
+        <MavenRunnerParameters>
+          <option name="cmdOptions" value="" />
+          <option name="profiles">
+            <set />
+          </option>
+          <option name="goals">
+            <list>
+              <option value="validate" />
+            </list>
+          </option>
+          <option name="multimoduledir" />
+          <option name="pomFileName" value="pom.xml" />
+          <option name="profilesMap">
+            <map />
+          </option>
+          <option name="projectsCmdOptionValues">
+            <list />
+          </option>
+          <option name="resolveToWorkspace" value="false" />
+          <option name="workingDirPath" value="$PROJECT_DIR$" />
+        </MavenRunnerParameters>
+      </option>
+    </MavenSettings>
+    <method v="2" />
+  </configuration>
+</component>
