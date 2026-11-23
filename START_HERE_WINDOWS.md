@@ -49,8 +49,8 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 1. Open a **Command Prompt** (press the Windows key, type `cmd`, press Enter).
 2. Type these two lines (replace `<you>` with your Windows user name):
    ```
-   cd C:\Users\<you>\IdeaProjects\drishti-platform\drishti
-   py -3.13 tools\drishti.py setup --system --wheels C:\Users\<you>\drishti-wheels
+   cd "C:\Users\<you>\IdeaProjects\drishti-platform\drishti"
+   py -3.13 tools\drishti.py setup --system --wheels "C:\Users\<you>\drishti-wheels"
    ```
    *You should see* a list of lines starting with `[  ok]`, the libraries installed from the wheels folder, and at the end **Next steps**.
    No internet is used. If a line says `[FAIL]`, it says what is wrong in plain words.

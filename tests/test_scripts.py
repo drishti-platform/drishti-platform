@@ -230,3 +230,13 @@ def test_wheels_bad_python_version(fake, monkeypatch):
     cfg, parent, tmp, _ = _wheels_fixture(fake, monkeypatch, [])
     with pytest.raises(pl.PlatformError):
         make_wheels.build(cfg, "rel", parent, tmp / "out", ["linux-x64"], "313")
+
+
+def test_latest_is_the_newest_released_release():
+    """The launchers say --release latest: the first release in platform.yaml marked released; any other name is itself."""
+    cfg = {"releases": {"i9": {"status": "pending"}, "i8": {"status": "released"}, "i7": {"status": "released"}}}
+    assert pl.resolve_release(cfg, "latest") == "i8"
+    assert pl.resolve_release(cfg, "i7") == "i7"
+    assert pl.resolve_release(cfg, None) is None
+    with pytest.raises(pl.PlatformError):
+        pl.resolve_release({"releases": {"i9": {"status": "pending"}}}, "latest")
