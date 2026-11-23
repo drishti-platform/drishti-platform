@@ -113,8 +113,7 @@ python build_all.py --release i7c --repo-local --skip-tests   # dedicated Maven 
 `--parent <folder>` changes the parent folder (default: the folder above this repository). Each library is built with its own
 `mvnw` / `mvnw.cmd`.
 
-**Or with Maven alone:** `clone_all.py` also puts `pom.xml` in the parent folder (it is in the source zip too, and attached to each
-release). In the parent folder, `mvn` builds tools, Rachana, Lake and Drishti in that order, each with its own wrapper in its own folder
+**Or with Maven alone:** `clone_all.py` also puts `pom.xml` in the parent folder (it is at the top of the source zip too). In the parent folder, `mvn` builds tools, Rachana, Lake and Drishti in that order, each with its own wrapper in its own folder
 (the default goals are `clean install`; `mvn -DskipTests` for a quick build). It stops at the first product that fails. On Windows
 the pom trusts the Windows certificate store for the product builds (`-Djavax.net.ssl.trustStoreType=Windows-ROOT`), so a corporate
 proxy's root certificate is accepted.
