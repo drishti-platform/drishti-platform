@@ -173,6 +173,8 @@ def _wheels_fixture(fake, monkeypatch, wheel_names):
     d = parent / "r-one"
     (d / "drishti-console").mkdir()
     (d / "drishti-console" / "requirements.txt").write_text("fastapi>=0.100\n")
+    (d / "config" / "compute" / "locks").mkdir(parents=True)
+    (d / "config" / "compute" / "locks" / "python.lock").write_text("# x\nnumpy==2.5.3 \\\n    --hash=sha256:aa\nsix==1.17.0 \\\n    --hash=sha256:bb\n")
     (d / "lib").mkdir()
     (d / "lib" / "lake-wheel.pin").write_text("ref=v1\nversion=0.9.1\nsha256=00\n")
     git(d, "add", ".")
@@ -207,7 +209,7 @@ def test_wheels_pack_contents_and_pip_arguments(fake, monkeypatch):
     assert [z.name for z in zips] == ["drishti-platform-rel-wheels-linux-x64-py313.zip", "drishti-platform-rel-wheels-windows-x64-py313.zip"]
     with zipfile.ZipFile(zips[0]) as z:
         assert {"fastapi-0.1-py3-none-any.whl", "drishti_lake-0.9.1-py3-none-any.whl", "README.txt", "SHA256SUMS"} <= set(z.namelist())
-        assert "setup --system --wheels" in z.read("README.txt").decode()
+        assert "setup --system --wheels" in z.read("README.txt").decode() and "python.lock" in z.namelist()
         assert "fastapi-0.1-py3-none-any.whl" in z.read("SHA256SUMS").decode()
     linux = calls[0]
     assert linux.count("--platform") == 3 and "--only-binary=:all:" in linux and linux[linux.index("--abi") + 1] == "cp313"

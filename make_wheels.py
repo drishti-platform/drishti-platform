@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import re
 import shutil
 import subprocess
 import sys
@@ -27,6 +28,7 @@ PLATFORMS = {
     "macos-x64": ["macosx_10_15_x86_64", "macosx_11_0_x86_64", "macosx_12_0_x86_64"],
 }
 REQUIREMENTS = "drishti-console/requirements.txt"
+LOCK = "config/compute/locks/python.lock"
 
 README = """Drishti platform {release}: Python wheels for {target}, Python {python}
 
@@ -38,7 +40,12 @@ How to use (on the offline machine, from the unzipped source bundle):
     py tools\\drishti.py setup --system --wheels <this zip or the folder you unzipped it to>
     (Linux and macOS: python3 tools/drishti.py setup --system --wheels <zip or folder>)
 
-Or by hand, into any Python {python}:
+The pack carries two requirement files, and setup installs both: requirements.txt (the console, with the Lake wheel) and python.lock
+(the server's compute lock: numpy, pandas, pyarrow, scipy ..., checked against the system interpreter before any Python run).
+They were resolved together, so they agree.
+
+Or by hand, into any Python {python} (python.lock first: it is hash-checked, so pip takes it on its own):
+    python -m pip install --no-index --find-links <folder> -r python.lock
     python -m pip install --no-index --find-links <folder> {lake_req} -r requirements.txt
 
 Wheels: {count}. Each file's SHA-256 is in SHA256SUMS.
@@ -76,15 +83,18 @@ def build_one(cfg: dict, release: str, parent: Path, out_dir: Path, target: str,
     if not drishti.is_dir():
         raise pl.PlatformError(f"{drishti} not found: run clone_all.py first")
     requirements = pl.git_show(drishti, refs["drishti"], REQUIREMENTS)
+    lock = pl.git_show(drishti, refs["drishti"], LOCK)                      # the server's compute lock, pins with hashes
+    pins = "".join(m.group(1) + "\n" for m in re.finditer(r"^([A-Za-z0-9_.\-]+==[^\s\\]+)", lock, re.M))
     pin = pl.lake_pin(cfg, refs, parent)
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp)
         lake = pl.build_lake_wheel(cfg, refs, parent, work / "lake") if lake_dir is None else next(lake_dir.glob("drishti_lake-*.whl"))
         (work / "requirements.txt").write_text(requirements, encoding="utf-8")
+        (work / "lock-pins.txt").write_text(pins, encoding="utf-8")        # pip applies hashes only when every requirement has one
         wheels = work / "wheels"
         wheels.mkdir()
         (wheels / lake.name).write_bytes(lake.read_bytes())
-        pip_download([str(wheels / lake.name), "-r", str(work / "requirements.txt")], wheels, target, python)
+        pip_download([str(wheels / lake.name), "-r", str(work / "requirements.txt"), "-r", str(work / "lock-pins.txt")], wheels, target, python)
         files = sorted(wheels.glob("*.whl"))
         sums = "".join(f"{hashlib.sha256(f.read_bytes()).hexdigest()}  {f.name}\n" for f in files)
         readme = README.format(release=release, target=target, python=python, tags=", ".join(PLATFORMS[target]), lake=lake.name,
@@ -101,6 +111,7 @@ def build_one(cfg: dict, release: str, parent: Path, out_dir: Path, target: str,
             for f in files:
                 put(f.name, f.read_bytes())
             put("requirements.txt", "".join(l for l in requirements.splitlines(True) if not l.startswith("--find-links")).encode())   # the pack is the link source
+            put("python.lock", lock.encode())
             put("README.txt", readme.encode())
             put("SHA256SUMS", sums.encode())
     return zpath
