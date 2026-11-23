@@ -43,20 +43,6 @@ releases:
     lake: v0.9.1
     elements: v3.3.2
     drishti: v2.9.11.i_7e
-  i7d:
-    status: released
-    tools: v1.1.0
-    rachana: v1.0.1
-    lake: v0.9.1
-    elements: v3.3.2
-    drishti: v2.9.11.i_7d
-  i7c:
-    status: released
-    tools: v1.1.0
-    rachana: v1.0.1
-    lake: v0.9.1
-    elements: v3.3.2
-    drishti: v2.9.11.i_7c
   i7b:
     status: released
     tools: v1.1.0
