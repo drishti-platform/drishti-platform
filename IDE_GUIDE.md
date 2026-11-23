@@ -2,6 +2,8 @@
 
 # The Drishti platform in your IDE
 
+**New to Drishti on Windows?** `START_HERE_WINDOWS.md` (and its PDF) beside this guide has the same path in plain words.
+
 From the release zip to a running Drishti server and console, with nothing to edit by hand. IntelliJ IDEA builds and runs the
 server (Java only); PyCharm runs the console (Python). Windows is shown; Linux and macOS are the same with `/` paths and `python3`.
 
@@ -67,7 +69,7 @@ This project only builds. To read and change a product's code, open that product
 **No virtual environment: the system Python.** Where a machine allows no `.venv` (everything goes to the Python the company
 provides), one command prepares it, standard library only to start with:
 
-1. `py tools\drishti.py setup --system` (or, in PyCharm, the launcher **Drishti: setup (system Python)**): it prepares Drishti (step 1) and
+1. `py tools\drishti.py setup --system --wheels C:\Users\<you>\drishti-wheels` with the release's offline wheel pack unzipped there (no package index, no internet; without `--wheels` pip uses your package index), or in PyCharm the launcher **Drishti: setup (system Python, offline wheels)** (it reads `%USERPROFILE%\drishti-wheels`): it prepares Drishti (step 1) and
    installs the console's libraries into that Python, the pinned Lake wheel from `lib\wheels\` first, then
    `drishti-console\requirements.txt`, through the Windows certificate store; it writes `drishti.python` (that Python's full path) into
    `dev.ini`.

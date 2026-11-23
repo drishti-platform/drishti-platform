@@ -19,7 +19,7 @@ from pathlib import Path
 
 import platform_lib as pl
 
-TOP_FILES = ["README.md", "COMPATIBILITY.md", "platform.yaml", "platform_lib.py", "build_all.py", "pom.xml", "IDE_GUIDE.md", "LICENSE"]
+TOP_FILES = ["README.md", "COMPATIBILITY.md", "platform.yaml", "platform_lib.py", "build_all.py", "pom.xml", "IDE_GUIDE.md", "START_HERE_WINDOWS.md", "START_HERE_WINDOWS.pdf", "LICENSE"]
 
 
 archive = pl.archive
