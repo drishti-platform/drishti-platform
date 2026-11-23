@@ -8,7 +8,7 @@
 <i>Your data is a treasury;</i> <b>Drishti is its sentinel.</b></p>
 
 <p align="center">
-  <a href="COMPATIBILITY.md"><img alt="platform release" src="https://img.shields.io/badge/platform-i7b-1f6feb"></a>
+  <a href="COMPATIBILITY.md"><img alt="platform release" src="https://img.shields.io/badge/platform-i7c-1f6feb"></a>
   <img alt="Java 21" src="https://img.shields.io/badge/Java-21-orange">
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Windows | Linux | macOS" src="https://img.shields.io/badge/runs%20on-Windows%20%7C%20Linux%20%7C%20macOS-555">
@@ -105,9 +105,9 @@ All repositories sit side by side in one parent folder:
 ## Get and build (Python 3.10+, JDK 21; no bash, no .exe)
 
 ```
-python clone_all.py --release i7b            # clone or update every repository at the release's tags (or --develop)
-python build_all.py --release i7b            # build and install in order, then build Drishti
-python build_all.py --release i7b --repo-local --skip-tests   # dedicated Maven repository (<parent>/.m2-drishti), no tests
+python clone_all.py --release i7c            # clone or update every repository at the release's tags (or --develop)
+python build_all.py --release i7c            # build and install in order, then build Drishti
+python build_all.py --release i7c --repo-local --skip-tests   # dedicated Maven repository (<parent>/.m2-drishti), no tests
 ```
 
 `--parent <folder>` changes the parent folder (default: the folder above this repository). Each library is built with its own
@@ -131,7 +131,7 @@ project to work on its code.
 
 ## Source bundle
 
-`python make_bundle.py --release i7b` writes `drishti-platform-i7b-source.zip`: every repository's source at its tag (`git archive`),
+`python make_bundle.py --release i7c` writes `drishti-platform-i7c-source.zip`: every repository's source at its tag (`git archive`),
 this README, `build_all.py` and `SHA-256SUMS`. Unzip, run `python build_all.py --bundle .`, done; it needs no network except Maven
 Central.
 

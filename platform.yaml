@@ -37,7 +37,7 @@ repos:
 # that will exist at the release; make_bundle.py refuses a tag that does not exist yet.
 releases:
   i7c:
-    status: pending
+    status: released
     tools: v1.1.0
     rachana: v1.0.1
     lake: v0.9.1
