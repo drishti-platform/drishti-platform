@@ -65,22 +65,15 @@ This project only builds. To read and change a product's code, open that product
 4. **Check:** open `http://localhost:17480`, sign in as `drishti-dev-admin` / `drishti-dev-admin123`, type `VAR BANK` and press **GO**.
 
 **No virtual environment: the system Python.** Where a machine allows no `.venv` (everything goes to the Python the company
-provides), skip it and install the console's libraries into that Python yourself:
+provides), one command prepares it, standard library only to start with:
 
-1. `py tools\drishti.py setup --skip-venv`: everything step 1 does, except making `drishti-console\.venv`.
-2. The libraries, into the system Python (the Lake wheel first: the requirements name `drishti-lake==<version>`, which no package index has):
-   ```
-   py -m pip install drishti\lib\wheels\drishti_lake-0.9.1-py3-none-any.whl
-   py -m pip install -r drishti\drishti-console\requirements.txt
-   ```
-   (the wheel's version is the one in `drishti\lib\lake-wheel.pin`; the file in `lib\wheels\` is the one to install).
-3. PyCharm: **Settings, Project, Python Interpreter, Add Interpreter, System Interpreter**: the company's `python.exe`. The launchers use
-   the project's interpreter, so nothing else changes.
-4. The server finds that Python too: with no `.venv` it runs `python` (Windows) or `python3` (Linux, macOS) for its Python work (data
-   feeds, the compute pool). To name one exactly, set `DRISHTI_PYTHON` (for example `C:\Python312\python.exe`) in the environment
-   IntelliJ starts the server with, or `drishti.feeds.python` in `dev.ini`.
-5. Check (in `drishti\`): `py tools\lake\lakewheel.py` shows the pinned wheel `(ok)`, and `py tools\drishti.py setup --check --skip-venv` lists
-   nothing to do.
+1. `py tools\drishti.py setup --system` (or, in PyCharm, the launcher **Drishti: setup (system Python)**): it prepares Drishti (step 1) and
+   installs the console's libraries into that Python, the pinned Lake wheel from `lib\wheels\` first, then
+   `drishti-console\requirements.txt`, through the Windows certificate store; it writes `drishti.python` (that Python's full path) into
+   `dev.ini`.
+2. PyCharm: **Settings, Project, Python Interpreter, Add Interpreter, System Interpreter**: the same `python.exe`.
+3. Nothing to set for the server: it reads `drishti.python` from `dev.ini` for its Python work (`DRISHTI_PYTHON` only overrides it).
+4. Check: `py tools\drishti.py setup --check --system` lists every library and says what, if anything, is missing.
 
 Drishti's own IDE guide (`drishti\docs\guides\IDE_GUIDE.md`) has every launcher, the settings file, a step-by-step check of each step
 (section 8) and the troubleshooting recipes (section 6). The deployment and QA guide (`drishti\docs\DEPLOYMENT_AND_QA_GUIDE.md`) covers
