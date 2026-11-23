@@ -137,7 +137,7 @@ Central.
 ## Offline wheel packs
 
 `python make_wheels.py --release i7e --parent <folder> --out <folder> [--target windows-x64|linux-x64|macos-arm64|macos-x64|all]`
-writes `drishti-platform-i7c-wheels-<target>-py313.zip` (Python 3.13 by default, `--python` to change): every binary wheel the
+writes `drishti-platform-<release>-wheels-<target>-py313.zip` (Python 3.13 by default, `--python` to change): every binary wheel the
 console needs on that platform (its `requirements.txt` at the release tag) plus the pinned Lake wheel and its dependencies and the server's compute lock (`python.lock`),
 with `README.txt` and `SHA256SUMS`. On a machine without network, `py tools\drishti.py setup --system --wheels <zip or unzipped
 folder>` installs from it. The script refuses, naming the requirement, when one has no binary wheel for a target.
