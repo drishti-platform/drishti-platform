@@ -24,7 +24,7 @@
 
   In the parent folder:
       mvn                                    the default: clean install, every product in order (installs into your ~/.m2)
-      mvn -Dgoals="clean install -DskipTests"   a quick build
+      mvn -DskipTests                        a quick build (IntelliJ: the Maven window's "Skip Tests" toggle)
       mvn -Dgoals="clean verify"             build and test, install nothing (each product then needs the one before it in ~/.m2)
 
   Each product is built by its own Maven wrapper in its own folder, exactly as it is built on its own and in the drill: this file
@@ -44,6 +44,8 @@
 
     <properties>
         <goals>clean install</goals>
+        <!-- IntelliJ's "Skip Tests" toggle and mvn -DskipTests set this; it is passed on to every product's own build -->
+        <skipTests>false</skipTests>
         <mvnw>./mvnw</mvnw>
     </properties>
 
@@ -70,7 +72,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-tools/java</workingDirectory>
                             <executable>${project.basedir}/drishti-tools/java/${mvnw}</executable>
-                            <commandlineArgs>-B ${goals}</commandlineArgs>
+                            <commandlineArgs>-B -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -80,7 +82,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-rachana/java</workingDirectory>
                             <executable>${project.basedir}/drishti-rachana/java/${mvnw}</executable>
-                            <commandlineArgs>-B ${goals}</commandlineArgs>
+                            <commandlineArgs>-B -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -90,7 +92,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-lake/java</workingDirectory>
                             <executable>${project.basedir}/drishti-lake/java/${mvnw}</executable>
-                            <commandlineArgs>-B ${goals}</commandlineArgs>
+                            <commandlineArgs>-B -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -100,7 +102,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti</workingDirectory>
                             <executable>${project.basedir}/drishti/${mvnw}</executable>
-                            <commandlineArgs>-B ${goals}</commandlineArgs>
+                            <commandlineArgs>-B -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>
