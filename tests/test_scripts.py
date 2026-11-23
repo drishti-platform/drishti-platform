@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import build_all  # noqa: E402
 import clone_all  # noqa: E402
 import make_bundle  # noqa: E402
+import make_wheels  # noqa: E402
 import platform_lib as pl  # noqa: E402
 
 YAML = """
@@ -156,3 +157,74 @@ def test_bundle_refuses_missing_tag(fake, monkeypatch):
     clone_all.main(["--release", "rel", "--parent", str(parent)])
     with pytest.raises(pl.PlatformError):
         make_bundle.build(cfg, "rel", parent, tmp / "out")
+
+
+def _wheels_fixture(fake, monkeypatch, wheel_names):
+    """A release whose r-one plays Drishti (requirements + pin) and r-two plays Lake; pip and the Lake build are mocked."""
+    tmp, cfg = fake
+    cfg["repos"]["drishti"] = cfg["repos"].pop("one")
+    cfg["repos"]["lake"] = cfg["repos"].pop("two")
+    cfg["releases"]["rel"] = {"top": "v1", "drishti": "v1", "lake": "v1"}
+    monkeypatch.setattr(pl, "load", lambda path=None: cfg)
+    parent = tmp / "parent"
+    for name, repo in (("drishti", "r-one"), ("lake", "r-two")):
+        clone = parent / repo
+        subprocess.run(["git", "clone", "-q", (tmp / "origin" / (repo + ".git")).as_posix(), str(clone)], check=True)
+    d = parent / "r-one"
+    (d / "drishti-console").mkdir()
+    (d / "drishti-console" / "requirements.txt").write_text("fastapi>=0.100\n")
+    (d / "lib").mkdir()
+    (d / "lib" / "lake-wheel.pin").write_text("ref=v1\nversion=0.9.1\nsha256=00\n")
+    git(d, "add", ".")
+    git(d, "commit", "-q", "-m", "reqs")
+    git(d, "tag", "-f", "v1")
+    calls = []
+
+    def fake_lake(cfg_, refs, parent_, out):
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "drishti_lake-0.9.1-py3-none-any.whl").write_bytes(b"lake")
+        return out / "drishti_lake-0.9.1-py3-none-any.whl"
+
+    real_run = subprocess.run
+
+    def fake_run(cmd, **kw):                                              # only pip is mocked; git still runs
+        if "pip" not in cmd:
+            return real_run(cmd, **kw)
+        calls.append(cmd)
+        dest = Path(cmd[cmd.index("-d") + 1])
+        for w in wheel_names:
+            (dest / w).write_bytes(b"w" + w.encode())
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    monkeypatch.setattr(pl, "build_lake_wheel", fake_lake)
+    monkeypatch.setattr(make_wheels.subprocess, "run", fake_run)
+    return cfg, parent, tmp, calls
+
+
+def test_wheels_pack_contents_and_pip_arguments(fake, monkeypatch):
+    cfg, parent, tmp, calls = _wheels_fixture(fake, monkeypatch, ["fastapi-0.1-py3-none-any.whl"])
+    zips = make_wheels.build(cfg, "rel", parent, tmp / "out", ["linux-x64", "windows-x64"], "3.13")
+    assert [z.name for z in zips] == ["drishti-platform-rel-wheels-linux-x64-py313.zip", "drishti-platform-rel-wheels-windows-x64-py313.zip"]
+    with zipfile.ZipFile(zips[0]) as z:
+        assert {"fastapi-0.1-py3-none-any.whl", "drishti_lake-0.9.1-py3-none-any.whl", "README.txt", "SHA256SUMS"} <= set(z.namelist())
+        assert "setup --system --wheels" in z.read("README.txt").decode()
+        assert "fastapi-0.1-py3-none-any.whl" in z.read("SHA256SUMS").decode()
+    linux = calls[0]
+    assert linux.count("--platform") == 3 and "--only-binary=:all:" in linux and linux[linux.index("--abi") + 1] == "cp313"
+    assert calls[1].count("--platform") == 1 and "win_amd64" in calls[1]
+
+
+def test_wheels_refuses_without_binary_wheel(fake, monkeypatch):
+    cfg, parent, tmp, _ = _wheels_fixture(fake, monkeypatch, [])
+    err = "ERROR: No matching distribution found for fancylib==1"
+    monkeypatch.setattr(make_wheels.subprocess, "run", lambda cmd, **kw: subprocess.CompletedProcess(cmd, 1, "", err))
+    monkeypatch.setattr(pl, "lake_pin", lambda *a: {"version": "0.9.1"})
+    monkeypatch.setattr(pl, "git_show", lambda *a: "fastapi\n")
+    with pytest.raises(pl.PlatformError, match="fancylib"):
+        make_wheels.build(cfg, "rel", parent, tmp / "out", ["macos-x64"], "3.13")
+
+
+def test_wheels_bad_python_version(fake, monkeypatch):
+    cfg, parent, tmp, _ = _wheels_fixture(fake, monkeypatch, [])
+    with pytest.raises(pl.PlatformError):
+        make_wheels.build(cfg, "rel", parent, tmp / "out", ["linux-x64"], "313")

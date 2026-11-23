@@ -1,9 +1,14 @@
 # Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>. All rights reserved.
 # Drishti platform. Proprietary: see LICENSE.
-"""Shared by clone_all.py, build_all.py and make_bundle.py: reads platform.yaml (a subset of YAML, standard library only)."""
+"""Shared by clone_all.py, build_all.py, make_bundle.py and make_wheels.py: reads platform.yaml (a subset of YAML, standard library only)."""
 from __future__ import annotations
 
+import hashlib
+import io
+import subprocess
 import sys
+import tarfile
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -86,3 +91,51 @@ def default_parent() -> Path:
 def fail(error: Exception) -> int:
     print(f"error: {error}", file=sys.stderr)
     return 2
+
+
+def archive(folder: Path, ref: str) -> bytes:
+    """git archive of <ref> in <folder> (a tar)."""
+    check = subprocess.run(["git", "rev-parse", "--verify", "--quiet", ref + "^{commit}"], cwd=folder, capture_output=True)
+    if check.returncode != 0:
+        raise PlatformError(f"{folder.name}: '{ref}' does not exist yet")
+    out = subprocess.run(["git", "archive", "--format=tar", ref], cwd=folder, capture_output=True)
+    if out.returncode != 0:
+        raise PlatformError(f"git archive failed in {folder}: {out.stderr.decode(errors='replace')}")
+    return out.stdout
+
+
+def git_show(folder: Path, ref: str, path: str) -> str:
+    """A file's text at a ref, read from git (never the working tree)."""
+    r = subprocess.run(["git", "show", f"{ref}:{path}"], cwd=folder, capture_output=True, text=True)
+    if r.returncode != 0:
+        raise PlatformError(f"{folder.name}: {path} not found at {ref}: {r.stderr.strip()}")
+    return r.stdout
+
+
+def lake_pin(cfg: dict, refs: dict, parent: Path) -> dict:
+    """drishti/lib/lake-wheel.pin at the Drishti ref: ref, version, sha256."""
+    text = git_show(parent / cfg["repos"]["drishti"]["repo"], refs["drishti"], "lib/lake-wheel.pin")
+    return dict(l.split("=", 1) for l in text.splitlines() if l and not l.startswith("#") and "=" in l)
+
+
+def build_lake_wheel(cfg: dict, refs: dict, parent: Path, out: Path) -> Path:
+    """Build the pinned Lake wheel from the Lake checkout at the pin's ref (uv build is reproducible), check its SHA-256 against the
+    pin, and leave it in <out>."""
+    pin = lake_pin(cfg, refs, parent)
+    lake = parent / cfg["repos"]["lake"]["repo"]
+    out.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory() as tmp:
+        src = Path(tmp) / "lake"
+        with tarfile.open(fileobj=io.BytesIO(archive(lake, pin["ref"]))) as tar:
+            tar.extractall(src, filter="data")
+        built = Path(tmp) / "wheels"
+        r = subprocess.run(["uv", "build", "--wheel", str(src / "python"), "--out-dir", str(built)], capture_output=True, text=True)
+        if r.returncode != 0:
+            raise PlatformError(f"the Lake wheel did not build (uv build): {r.stderr.strip()[-400:]}")
+        wheel = built / f"drishti_lake-{pin['version']}-py3-none-any.whl"
+        data = wheel.read_bytes()
+    if hashlib.sha256(data).hexdigest() != pin["sha256"]:
+        raise PlatformError(f"the Lake wheel built from {pin['ref']} is not the one Drishti pins (sha256 {pin['sha256']})")
+    target = out / wheel.name
+    target.write_bytes(data)
+    return target

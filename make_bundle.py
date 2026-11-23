@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import io
-import subprocess
 import sys
 import tarfile
 import tempfile
@@ -23,38 +22,16 @@ import platform_lib as pl
 TOP_FILES = ["README.md", "COMPATIBILITY.md", "platform.yaml", "platform_lib.py", "build_all.py", "pom.xml", "IDE_GUIDE.md", "LICENSE"]
 
 
-def archive(folder: Path, ref: str) -> bytes:
-    check = subprocess.run(["git", "rev-parse", "--verify", "--quiet", ref + "^{commit}"], cwd=folder, capture_output=True)
-    if check.returncode != 0:
-        raise pl.PlatformError(f"{folder.name}: '{ref}' does not exist yet")
-    out = subprocess.run(["git", "archive", "--format=tar", ref], cwd=folder, capture_output=True)
-    if out.returncode != 0:
-        raise pl.PlatformError(f"git archive failed in {folder}: {out.stderr.decode(errors='replace')}")
-    return out.stdout
+archive = pl.archive
 
 
 def lake_wheel(cfg: dict, refs: dict, parent: Path) -> tuple[str, bytes] | None:
-    """Drishti's pinned Lake wheel (drishti/lib/lake-wheel.pin: ref, version, sha256), built from the Lake checkout at the release tag
-    (uv build is reproducible) and checked against the pin, so the unzipped bundle runs the console with no build step of its own."""
+    """Drishti's pinned Lake wheel, built and checked against the pin (platform_lib.build_lake_wheel), placed where Drishti looks for it."""
     if "drishti" not in refs or "lake" not in refs:                         # a release without both has no wheel to carry
         return None
-    drishti = parent / cfg["repos"]["drishti"]["repo"]
-    pin = dict(l.split("=", 1) for l in subprocess.run(["git", "show", f"{refs['drishti']}:lib/lake-wheel.pin"], cwd=drishti,
-               capture_output=True, text=True, check=True).stdout.splitlines() if l and not l.startswith("#") and "=" in l)
-    lake = parent / cfg["repos"]["lake"]["repo"]
     with tempfile.TemporaryDirectory() as tmp:
-        src = Path(tmp) / "lake"
-        with tarfile.open(fileobj=io.BytesIO(archive(lake, pin["ref"]))) as tar:
-            tar.extractall(src, filter="data")
-        out = Path(tmp) / "wheels"
-        r = subprocess.run(["uv", "build", "--wheel", str(src / "python"), "--out-dir", str(out)], capture_output=True, text=True)
-        if r.returncode != 0:
-            raise pl.PlatformError(f"the Lake wheel did not build (uv build): {r.stderr.strip()[-400:]}")
-        wheel = out / f"drishti_lake-{pin['version']}-py3-none-any.whl"
-        data = wheel.read_bytes()
-    if hashlib.sha256(data).hexdigest() != pin["sha256"]:
-        raise pl.PlatformError(f"the Lake wheel built from {pin['ref']} is not the one Drishti pins (sha256 {pin['sha256']})")
-    return f"{cfg['repos']['drishti']['repo']}/lib/wheels/{wheel.name}", data
+        wheel = pl.build_lake_wheel(cfg, refs, parent, Path(tmp))
+        return f"{cfg['repos']['drishti']['repo']}/lib/wheels/{wheel.name}", wheel.read_bytes()
 
 
 def build(cfg: dict, release: str, parent: Path, out_dir: Path) -> Path:
