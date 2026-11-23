@@ -58,7 +58,9 @@ This project only builds. To read and change a product's code, open that product
    py tools\drishti.py setup
    ```
    It makes the settings file `%USERPROFILE%\drishti-envs\dev.ini`, the JVM argument files and the console's Python
-   (`drishti-console\.venv`), and prints the next steps. It never overwrites an existing `dev.ini`.
+   (`drishti-console\.venv`), and prints the next steps. An older `dev.ini` or JVM argument file from another copy of Drishti is
+   moved into a dated folder, `%USERPROFILE%\drishti-envs\replaced-<date>\`, and a fresh one written: nothing is lost and nothing
+   is left to rename by hand. Setup never creates a folder outside this checkout.
 2. **Server, IntelliJ (window 2):** **File, Open** `drishti\pom.xml`, **Open as Project**, the same JDK 21. Run **Drishti: run server (demo)**.
    *You should see* `Started DrishtiApplication`.
 3. **Console, PyCharm:** **File, Open** the `drishti` folder. **Settings, Project, Python Interpreter, Add Interpreter, Existing**:

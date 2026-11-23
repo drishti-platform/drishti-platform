@@ -54,6 +54,8 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
    ```
    *You should see* a list of lines starting with `[  ok]`, the libraries installed from the wheels folder, and at the end **Next steps**.
    No internet is used. If a line says `[FAIL]`, it says what is wrong in plain words.
+   If you used Drishti before, a line may say that your old settings were **moved** to
+   `C:\Users\<you>\drishti-envs\replaced-<date>`: that is expected, nothing is lost, and there is nothing to do.
 3. Note the path on the line that starts with `[  ok] python` (for example `C:\Users\<you>\AppData\Local\Programs\Python\Python313\python.exe`):
    PyCharm needs it in step 5.
 
