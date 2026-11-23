@@ -56,6 +56,9 @@
         <!-- JVM options for every product's build; on Windows the profile below trusts the Windows certificate store
              (a corporate proxy's root is there), so Maven Central is reached; -Dplatform.trust= turns it off -->
         <platform.trust></platform.trust>
+        <!-- the Python the product builds start (Rachana's build helpers read -Dpython3); on Windows the profile below uses the
+             Python launcher `py`, because `python3`/`python` there is often the Microsoft Store stub, not the installed Python -->
+        <platform.python></platform.python>
     </properties>
 
     <profiles>
@@ -65,6 +68,7 @@
             <properties>
                 <mvnw>mvnw.cmd</mvnw>
                 <platform.trust>-Djavax.net.ssl.trustStoreType=Windows-ROOT</platform.trust>
+                <platform.python>-Dpython3=py</platform.python>
             </properties>
         </profile>
     </profiles>
@@ -84,7 +88,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-tools/java</workingDirectory>
                             <executable>${project.basedir}/drishti-tools/java/${mvnw}</executable>
-                            <commandlineArgs>-B ${platform.trust} -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} ${platform.python} -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -94,7 +98,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-rachana/java</workingDirectory>
                             <executable>${project.basedir}/drishti-rachana/java/${mvnw}</executable>
-                            <commandlineArgs>-B ${platform.trust} -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} ${platform.python} -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -104,7 +108,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti-lake/java</workingDirectory>
                             <executable>${project.basedir}/drishti-lake/java/${mvnw}</executable>
-                            <commandlineArgs>-B ${platform.trust} -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} ${platform.python} -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                     <execution>
@@ -114,7 +118,7 @@
                         <configuration>
                             <workingDirectory>${project.basedir}/drishti</workingDirectory>
                             <executable>${project.basedir}/drishti/${mvnw}</executable>
-                            <commandlineArgs>-B ${platform.trust} -DskipTests=${skipTests} ${goals}</commandlineArgs>
+                            <commandlineArgs>-B ${platform.trust} ${platform.python} -DskipTests=${skipTests} ${goals}</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>
