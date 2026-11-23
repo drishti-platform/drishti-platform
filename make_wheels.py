@@ -136,7 +136,7 @@ def main(argv: list[str] | None = None) -> int:
     a = p.parse_args(argv)
     targets = list(PLATFORMS) if a.target == "all" else [a.target]
     try:
-        zips = build(pl.load(), a.release, a.parent.resolve(), a.out.resolve(), targets, a.python)
+        zips = build(pl.load(), pl.resolve_release(pl.load(), a.release), a.parent.resolve(), a.out.resolve(), targets, a.python)
     except pl.PlatformError as e:
         return pl.fail(e)
     for z in zips:

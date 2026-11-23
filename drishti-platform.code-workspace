@@ -25,9 +25,9 @@
       {
         "label": "Platform: clone all",
         "type": "shell",
-        "command": "python3 clone_all.py --release i7b",
+        "command": "python3 clone_all.py --release latest",
         "windows": {
-          "command": "python clone_all.py --release i7b"
+          "command": "python clone_all.py --release latest"
         },
         "options": {
           "cwd": "${workspaceFolder:platform}"
@@ -37,9 +37,9 @@
       {
         "label": "Platform: build all",
         "type": "shell",
-        "command": "python3 build_all.py --release i7b",
+        "command": "python3 build_all.py --release latest",
         "windows": {
-          "command": "python build_all.py --release i7b"
+          "command": "python build_all.py --release latest"
         },
         "options": {
           "cwd": "${workspaceFolder:platform}"
@@ -49,9 +49,9 @@
       {
         "label": "Platform: build all (skip tests)",
         "type": "shell",
-        "command": "python3 build_all.py --release i7b --skip-tests --repo-local",
+        "command": "python3 build_all.py --release latest --skip-tests --repo-local",
         "windows": {
-          "command": "python build_all.py --release i7b --skip-tests --repo-local"
+          "command": "python build_all.py --release latest --skip-tests --repo-local"
         },
         "options": {
           "cwd": "${workspaceFolder:platform}"
@@ -61,9 +61,9 @@
       {
         "label": "Platform: make bundle",
         "type": "shell",
-        "command": "python3 make_bundle.py --release i7b",
+        "command": "python3 make_bundle.py --release latest",
         "windows": {
-          "command": "python make_bundle.py --release i7b"
+          "command": "python make_bundle.py --release latest"
         },
         "options": {
           "cwd": "${workspaceFolder:platform}"
@@ -94,7 +94,7 @@
         "program": "${workspaceFolder:platform}/clone_all.py",
         "args": [
           "--release",
-          "i7b"
+          "latest"
         ],
         "cwd": "${workspaceFolder:platform}",
         "console": "integratedTerminal"
@@ -106,7 +106,7 @@
         "program": "${workspaceFolder:platform}/build_all.py",
         "args": [
           "--release",
-          "i7b"
+          "latest"
         ],
         "cwd": "${workspaceFolder:platform}",
         "console": "integratedTerminal"
@@ -118,7 +118,7 @@
         "program": "${workspaceFolder:platform}/build_all.py",
         "args": [
           "--release",
-          "i7b",
+          "latest",
           "--skip-tests", "--repo-local"
         ],
         "cwd": "${workspaceFolder:platform}",
@@ -131,7 +131,7 @@
         "program": "${workspaceFolder:platform}/make_bundle.py",
         "args": [
           "--release",
-          "i7b"
+          "latest"
         ],
         "cwd": "${workspaceFolder:platform}",
         "console": "integratedTerminal"

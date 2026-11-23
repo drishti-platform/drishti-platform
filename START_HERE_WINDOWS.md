@@ -15,6 +15,10 @@ Ask your IT team to install these once, if they are not already on the PC:
 - **IntelliJ IDEA** and **PyCharm** (the free Community editions are enough).
 - Step 3 needs the company network (it fetches the build tools once).
 
+**Two programs, two folders of launchers.** IntelliJ IDEA runs the Java launchers (the folders **Platform-java** and
+**Drishti-java**); PyCharm runs the Python ones (**Drishti-python**). Each program shows the other's folder with a red mark: that is
+expected, just use your own folder.
+
 ## 1. Download two files
 
 From the release page (<https://github.com/drishti-platform/drishti-platform/releases>, the newest release):
@@ -36,7 +40,7 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
    If IntelliJ asks whether to trust the project, click **Trust Project**.
 2. **File → Project Structure → Project → SDK**: choose the Java 21 folder (**Add SDK → JDK…** if it is not listed). Click **OK**.
 3. Wait until the progress bar at the bottom finishes (indexing). Then, at the top right, open the list of run configurations, choose
-   **platform-clean-install**, and click the green **Run** arrow.
+   **platform-clean-install** (folder **Platform-java**), and click the green **Run** arrow.
 4. Wait. It takes several minutes the first time.
    *You should see* `BUILD SUCCESS` at the end of the output.
 
@@ -59,16 +63,16 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
    if asked. If PyCharm offers to create a virtual environment, click **Cancel**: Drishti uses the Python from step 4.
 2. **Settings → Project → Python Interpreter → Add Interpreter → Add Local Interpreter → System Interpreter**: choose the `python.exe`
    you noted in step 4. Click **OK**, and wait until the progress bar at the bottom finishes.
-3. At the top right choose **Drishti: build demo lakes** and click **Run**.
+3. At the top right choose **Drishti: build demo lakes** (folder **Drishti-python**) and click **Run**.
    *You should see* `Demo lake ready` at the end (a few minutes). Only needed the first time.
 
 ## 6. Start Drishti
 
 1. **The server (IntelliJ IDEA):** **File → Open**, choose `C:\Users\<you>\IdeaProjects\drishti-platform\drishti\pom.xml`,
    **Open as Project**, and choose **New Window** when asked. Trust the project, pick the same Java 21 as in step 3, and wait for the
-   progress bar. Choose **Drishti: run server (demo)** at the top right and click **Run**.
+   progress bar. Choose **Drishti: run server (demo)** (folder **Drishti-java**) at the top right and click **Run**.
    *You should see* `Started DrishtiApplication` after a minute or so. Leave this window open.
-2. **The console (PyCharm):** choose **Drishti: run console** and click **Run**.
+2. **The console (PyCharm):** choose **Drishti: run console** (folder **Drishti-python**) and click **Run**.
    *You should see* `Uvicorn running on http://0.0.0.0:17480`.
 3. The first time, Windows may ask whether Java and Python may use the network: click **Allow**.
 

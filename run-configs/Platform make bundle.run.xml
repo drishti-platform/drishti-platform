@@ -2,11 +2,11 @@
   Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>. All rights reserved.
   Drishti platform. Proprietary: see LICENSE.
 
-  Platform: make bundle: Writes drishti-platform-i7b-source.zip in the project folder (every repository's source at its tag + build_all.py + SHA-256SUMS).
+  Platform: make bundle: Writes drishti-platform-<release>-source.zip in the project folder (every repository's source at its tag + build_all.py + SHA-256SUMS).
   Shared, so it is in git: copy the configuration (Ctrl+D) to change it; a pull overwrites this file.
 -->
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Platform: make bundle" type="PythonConfigurationType" factoryName="Python" folderName="Platform">
+  <configuration default="false" name="Platform: make bundle" type="PythonConfigurationType" factoryName="Python" folderName="Platform-python">
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -20,7 +20,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/make_bundle.py" />
-    <option name="PARAMETERS" value="--release i7b" />
+    <option name="PARAMETERS" value="--release latest" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

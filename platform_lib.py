@@ -68,6 +68,17 @@ def repo_url(cfg: dict, name: str) -> str:
     return f"{cfg['url_base'].rstrip('/')}/{cfg['repos'][name]['repo']}.git"
 
 
+def resolve_release(cfg: dict, release: str | None) -> str | None:
+    """``latest`` is the newest released platform release (the first in platform.yaml with status released); any other name is itself.
+    The launchers use ``latest``, so they never name an old release."""
+    if release != "latest":
+        return release
+    for name, rel in cfg["releases"].items():
+        if rel.get("status") == "released":
+            return name
+    raise PlatformError("no release in platform.yaml is marked released")
+
+
 def refs_for(cfg: dict, release: str | None, develop: bool) -> dict:
     """The ref (tag or branch) of every repository, in install order."""
     names = list(cfg["repos"])
@@ -75,6 +86,7 @@ def refs_for(cfg: dict, release: str | None, develop: bool) -> dict:
         return {n: "develop" for n in names}
     if not release:
         raise PlatformError("give --release <name> (or --develop); known: " + ", ".join(cfg["releases"]))
+    release = resolve_release(cfg, release)
     if release not in cfg["releases"]:
         raise PlatformError(f"unknown release '{release}'; known: " + ", ".join(cfg["releases"]))
     rel = cfg["releases"][release]

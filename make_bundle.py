@@ -75,7 +75,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", type=Path, default=Path.cwd())
     a = p.parse_args(argv)
     try:
-        target = build(pl.load(), a.release, a.parent.resolve(), a.out.resolve())
+        target = build(pl.load(), pl.resolve_release(pl.load(), a.release), a.parent.resolve(), a.out.resolve())
     except pl.PlatformError as e:
         return pl.fail(e)
     print(f"{target} ({target.stat().st_size} bytes)")

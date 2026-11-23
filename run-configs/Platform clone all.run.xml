@@ -2,11 +2,11 @@
   Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>. All rights reserved.
   Drishti platform. Proprietary: see LICENSE.
 
-  Platform: clone all: Clones or updates every repository into the parent folder at the i7b tags (use the develop option for develop).
+  Platform: clone all: Clones or updates every repository into the parent folder at the tags of the newest release (use the develop option for develop).
   Shared, so it is in git: copy the configuration (Ctrl+D) to change it; a pull overwrites this file.
 -->
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Platform: clone all" type="PythonConfigurationType" factoryName="Python" folderName="Platform">
+  <configuration default="false" name="Platform: clone all" type="PythonConfigurationType" factoryName="Python" folderName="Platform-python">
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
@@ -20,7 +20,7 @@
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/clone_all.py" />
-    <option name="PARAMETERS" value="--release i7b" />
+    <option name="PARAMETERS" value="--release latest" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

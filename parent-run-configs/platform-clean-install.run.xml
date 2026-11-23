@@ -7,7 +7,7 @@
   launcher runs the platform pom: clean install of tools, Rachana, Lake and Drishti, in that order, tests skipped.
 -->
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="platform-clean-install" type="MavenRunConfiguration" factoryName="Maven">
+  <configuration default="false" name="platform-clean-install" type="MavenRunConfiguration" factoryName="Maven" folderName="Platform-java">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings">
