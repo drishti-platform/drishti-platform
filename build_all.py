@@ -55,6 +55,19 @@ def maven_command(build_dir: Path, goal: str, skip_tests: bool, repo_local: Path
     return cmd
 
 
+def maven_env(build_dir: Path, environ: dict | None = None) -> dict:
+    """The environment of one Maven run. On Linux and macOS the tools' and Lake's wrappers put Maven's temporary folder under the build folder
+    in MAVEN_OPTS, unquoted: a folder name with a space then breaks Maven's start ("Could not find or load main class"). Such a path gets a
+    temporary folder of the system's instead, given here, so the wrapper keeps it."""
+    env = dict(os.environ if environ is None else environ)
+    if os.name != "nt" and " " in str(build_dir) and "-Djava.io.tmpdir=" not in env.get("MAVEN_OPTS", ""):
+        import tempfile
+        tmp = Path(tempfile.gettempdir()) / f"drishti-maven-{os.getuid()}"
+        tmp.mkdir(parents=True, exist_ok=True)
+        env["MAVEN_OPTS"] = f"-Djava.io.tmpdir={tmp} " + env.get("MAVEN_OPTS", "")
+    return env
+
+
 def plan(cfg: dict, parent: Path, skip_tests: bool, repo_local: Path | None) -> list[tuple[str, Path, list[str]]]:
     steps = []
     for name, spec in cfg["repos"].items():
@@ -101,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"== {name}: {' '.join(cmd)}   (in {build_dir})")
             if a.dry_run:
                 continue
-            if subprocess.run(cmd, cwd=build_dir).returncode != 0:
+            if subprocess.run(cmd, cwd=build_dir, env=maven_env(build_dir)).returncode != 0:
                 raise pl.PlatformError(f"the build of {name} failed; fix it and run again (finished repositories are not repeated if you start from it manually)")
     except pl.PlatformError as e:
         return pl.fail(e)

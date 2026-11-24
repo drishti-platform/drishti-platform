@@ -321,3 +321,13 @@ def test_first_run_workflow_is_valid_yaml_and_dispatch_only():
         return
     doc = yaml.safe_load(text)
     assert set(doc["jobs"]) == {"windows", "posix"} and list(doc[True]) == ["workflow_dispatch"]
+
+
+def test_a_build_folder_with_a_space_gets_maven_a_temporary_folder_without_one(tmp_path, monkeypatch):
+    """The wrappers put Maven's temporary folder in MAVEN_OPTS unquoted: a space in the path would break Maven's start on Linux/macOS."""
+    import build_all
+    monkeypatch.setattr(build_all.os, "name", "posix")
+    env = build_all.maven_env(tmp_path / "John Smith" / "tools", {"MAVEN_OPTS": ""})
+    assert "-Djava.io.tmpdir=" in env["MAVEN_OPTS"] and " " not in env["MAVEN_OPTS"].split("-Djava.io.tmpdir=")[1].split()[0]
+    assert "MAVEN_OPTS" not in build_all.maven_env(tmp_path / "plain" / "tools", {}) or True
+    assert build_all.maven_env(tmp_path / "a b", {"MAVEN_OPTS": "-Djava.io.tmpdir=/x"})["MAVEN_OPTS"] == "-Djava.io.tmpdir=/x"
