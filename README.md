@@ -21,6 +21,12 @@ handful of rows, and explains every figure: where it came from, how it was calcu
 dashboards are described, not coded, in one grammar, and served to many users at once with roles, masks, four eyes and an audit trail,
 on one machine or a cluster. Drishti never invents a number: it shows what its sources supply and says exactly what is missing.
 
+**Visual analytics and GenUI from the same parts.** Screens are written in **Rachana**'s Sutra language and painted by **Elements**,
+plain JavaScript libraries for a grid with a pivot, charts, maps, forms and live tables. Together they give BI-style dashboards and
+reports, and they make GenUI safe: an AI assistant writes a Sutra through MCP tools, Rachana checks and compiles it, Elements draws it,
+with no generated code to trust. The same parts work outside Drishti: Rachana and Elements in your own Flask or FastAPI application,
+Lake as a Delta and Iceberg library in Java or Python, Tools as shared Java utilities.
+
 Everything specific to a field comes as a **module**: its data shapes, measures, screens and rules. Banking risk, capital markets,
 economic data and genomics are modules today; a new field is a new module, not a new product.
 
