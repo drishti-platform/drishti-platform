@@ -1,0 +1,266 @@
+# Drishti platform. Proprietary: see LICENSE.
+# First-run proof (docs/plans/FIRST_RUN_ROBUSTNESS.md, section C of the drishti repository). Started by hand, never by push or PR.
+#
+# ASSUMPTIONS (this workflow has not run yet; it cannot until all of them hold):
+#   1. Drishti i7g is released into the source zip: `tools/drishti.py doctor --acceptance` exists and prints the VAR BANK / ES figures,
+#      `setup` works without a venv and installs nothing (the job installs the libraries as the owner would), `lake demo --engine java` and `start all --demo` exist.
+#   2. A (draft) release named by the input exists on this repository with the assets
+#        drishti-platform-<release>-source.zip
+#        drishti-platform-<release>-wheels-<windows-x64|linux-x64|macos-arm64>-py313.zip
+#      and `gh release download` can read a DRAFT release with the workflow token (contents: write). To verify on the first run.
+#   3. build_all.py with no option, run from the unzipped source bundle, builds it (as --bundle .).
+#   4. Windows: python.org Python 3.13 with the `py` launcher is installed by the job (setup-python is not used, so there is
+#      no Python of the image on the PATH that a user would not have).
+name: first-run
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Release (draft is enough) on this repository's Releases page, e.g. i7g"
+        required: true
+      macos:
+        description: "Also run on macOS"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: first-run-${{ inputs.release }}
+  cancel-in-progress: true
+env:
+  REL: ${{ inputs.release }}
+  GH_TOKEN: ${{ github.token }}
+  PY_FULL: "3.13.9"
+  VAR: "167,372,692"
+  ES: "210,131,972"
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 75
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      PACK: drishti-platform-${{ inputs.release }}-wheels-windows-x64-py313.zip
+    steps:
+      - uses: actions/setup-java@v4.7.1
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: A home folder with a space; python.org Python with py, not on the PATH
+        run: |
+          $ErrorActionPreference = "Stop"
+          $home2 = "C:\Users\John Smith"
+          New-Item -ItemType Directory -Force "$home2\Downloads", "$home2\IdeaProjects", "$env:RUNNER_TEMP\poison", "$env:RUNNER_TEMP\out" | Out-Null
+          Invoke-WebRequest "https://www.python.org/ftp/python/$env:PY_FULL/python-$env:PY_FULL-amd64.exe" -OutFile "$env:RUNNER_TEMP\python-setup.exe"
+          Start-Process -Wait "$env:RUNNER_TEMP\python-setup.exe" -ArgumentList "/quiet","InstallAllUsers=0","PrependPath=0","Include_launcher=1","Include_test=0","Include_doc=0","Include_tcltk=0"
+          $launcher = "$env:LOCALAPPDATA\Programs\Python\Launcher"
+          # poison shims first on the PATH: a bare python/python3/pip/pip3/git/mvn call (a hidden use of the wrong interpreter or pip) fails loudly and is logged
+          foreach ($n in "python","python3","pip","pip3","git","mvn") {
+            Set-Content "$env:RUNNER_TEMP\poison\$n.cmd" "@echo %~n0 %* >> `"$env:RUNNER_TEMP\out\poison.log`"`r`n@exit /b 9009"
+          }
+          $keep = ($env:PATH -split ";" | Where-Object { $_ -and $_ -notmatch "\\Python|\\Git\\|\\maven" }) -join ";"
+          "PATH=$env:RUNNER_TEMP\poison;$launcher;$keep" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "PLATFORM=$home2\IdeaProjects\drishti-platform (1)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "DL=$home2\Downloads" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "OUT=$env:RUNNER_TEMP\out" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "USERPROFILE=$home2" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      - name: Which Python py starts
+        run: |
+          py -0p
+          py -3.13 -c "import sys; print(sys.executable, sys.version)"
+          if (Get-Command python.exe -ErrorAction SilentlyContinue | Where-Object { $_.Source -notmatch "poison" }) { throw "a real python.exe is on the PATH" }
+
+      - name: Download the source zip and the wheel pack; unzip the source only
+        run: |
+          $ErrorActionPreference = "Stop"
+          & "C:\Program Files\GitHub CLI\gh.exe" release download $env:REL --repo $env:GITHUB_REPOSITORY --dir $env:DL --pattern "drishti-platform-$env:REL-source.zip" --pattern $env:PACK
+          if ($LASTEXITCODE) { throw "download failed" }
+          New-Item -ItemType Directory -Force $env:PLATFORM | Out-Null
+          & "$env:SystemRoot\System32\tar.exe" -xf "$env:DL\drishti-platform-$env:REL-source.zip" -C $env:PLATFORM
+          if (Test-Path "$env:PLATFORM\drishti\.git") { throw "the source zip must hold no .git" }
+
+      - name: Build (build_all.py, no option, tests skipped)
+        working-directory: ${{ env.PLATFORM }}
+        run: |
+          py -3.13 build_all.py --skip-tests 2>&1 | Tee-Object "$env:OUT\build.txt"
+          if ($LASTEXITCODE) { throw "build failed" }
+
+      - name: The owner installs the libraries himself (Drishti never installs anything)
+        working-directory: ${{ env.PLATFORM }}\drishti\drishti-console
+        run: |
+          $ErrorActionPreference = "Stop"
+          $wheels = "$env:USERPROFILE\drishti-wheels"
+          New-Item -ItemType Directory -Force $wheels | Out-Null
+          & "$env:SystemRoot\System32\tar.exe" -xf "$env:DL\$env:PACK" -C $wheels
+          py -3.13 -m pip install --no-index --find-links "$wheels" -r requirements.txt 2>&1 | Tee-Object "$env:OUT\owner-pip.txt"
+          if ($LASTEXITCODE) { throw "the owner's pip install from the wheel pack failed" }
+
+      - name: Plant stale left-overs for every later step
+        run: |
+          $ErrorActionPreference = "Stop"
+          $envs = "$env:USERPROFILE\drishti-envs"
+          New-Item -ItemType Directory -Force $envs | Out-Null
+          Set-Content "$envs\dev.ini" "drishti.home=C:/old/drishti-orig`r`ndrishti.data.dir=C:/old/drishti-orig/data`r`ndrishti.python=C:/old/drishti-orig/drishti-console/.venv/Scripts/python.exe"
+          Set-Content "$envs\jvm-demo.args" "`"-Djava.io.tmpdir=C:/old/drishti-orig/data/tmp/server`""
+          foreach ($kv in "DRISHTI_HOME=C:\old\drishti-orig", "DRISHTI_DATA_DIR=C:\old\drishti-orig\data", "DRISHTI_TMP_DIR=C:\old\drishti-orig\data\tmp",
+                          "PIP_REQUIRE_VIRTUALENV=true", "PIP_INDEX_URL=http://127.0.0.1:9/simple", "HTTP_PROXY=http://127.0.0.1:9", "HTTPS_PROXY=http://127.0.0.1:9", "NO_PROXY=") {
+            $kv | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          }
+
+      - name: Setup, then the same line again (nothing may change)
+        working-directory: ${{ env.PLATFORM }}\drishti
+        run: |
+          function Tree($d) { (Get-ChildItem -Recurse -File $d | Sort-Object FullName | ForEach-Object { $_.FullName + " " + (Get-FileHash $_.FullName).Hash }) -join "`n" }
+          $site = py -3.13 -c "import sysconfig;print(sysconfig.get_paths()['purelib'])"
+          $libs = Tree $site
+          py -3.13 tools\drishti.py setup 2>&1 | Tee-Object "$env:OUT\setup-1.txt"
+          if ((Tree $site) -ne $libs) { throw "setup changed the Python's libraries: Drishti must never install" }
+          if ($LASTEXITCODE) { throw "setup failed" }
+          if ((Get-Content -Raw "$env:OUT\setup-1.txt") -match "127\.0\.0\.1:9") { throw "setup tried the dead package index" }
+          $before = Tree "$env:USERPROFILE\drishti-envs"
+          py -3.13 tools\drishti.py setup 2>&1 | Tee-Object "$env:OUT\setup-2.txt"
+          if ($LASTEXITCODE) { throw "the second setup failed" }
+          if ((Tree "$env:USERPROFILE\drishti-envs") -ne $before) { throw "the second setup changed the settings folder" }
+
+      - name: Demo lake, start, acceptance (VaR and ES), status, stop
+        working-directory: ${{ env.PLATFORM }}\drishti
+        run: |
+          py -3.13 tools\drishti.py lake demo --engine java 2>&1 | Tee-Object "$env:OUT\lake.txt"; if ($LASTEXITCODE) { throw "lake demo failed" }
+          py -3.13 tools\drishti.py start all --demo 2>&1 | Tee-Object "$env:OUT\start.txt";   if ($LASTEXITCODE) { throw "start all failed" }
+          py -3.13 tools\drishti.py doctor --acceptance 2>&1 | Tee-Object "$env:OUT\accept.txt"; if ($LASTEXITCODE) { throw "acceptance failed" }
+          $t = Get-Content -Raw "$env:OUT\accept.txt"
+          if ($t -notmatch [regex]::Escape($env:VAR) -or $t -notmatch [regex]::Escape($env:ES)) { throw "VaR or ES differs" }
+          py -3.13 tools\drishti.py status;   if ($LASTEXITCODE) { throw "status says something is not running" }
+          py -3.13 tools\drishti.py stop all; if ($LASTEXITCODE) { throw "stop failed" }
+
+      - name: The bare console (run_drishti_web.py, no arguments) against the server of start --demo
+        working-directory: ${{ env.PLATFORM }}\drishti
+        run: |
+          py -3.13 tools\drishti.py start server --demo --background; if ($LASTEXITCODE) { throw "start server failed" }
+          $py = (py -3.13 -c "import sys; print(sys.executable)")
+          $bare = Start-Process -PassThru -NoNewWindow $py -ArgumentList "drishti-console\run_drishti_web.py" -RedirectStandardError "$env:OUT\bare.txt"
+          $ok = $false
+          foreach ($i in 1..60) { try { if ((Invoke-WebRequest "http://localhost:17480" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200) { $ok = $true; break } } catch { Start-Sleep 2 } }
+          py -3.13 tools\drishti.py doctor --acceptance --wait 120 2>&1 | Tee-Object "$env:OUT\accept-bare.txt"
+          $rc = $LASTEXITCODE
+          Stop-Process -Id $bare.Id -Force
+          py -3.13 tools\drishti.py stop all
+          if (-not $ok -or $rc) { throw "the bare console did not answer or did not reach the server (see bare.txt)" }
+
+      - name: What must not have happened
+        if: always()
+        run: |
+          $bad = @()
+          if (Test-Path "$env:OUT\poison.log") { $bad += "python/pip/git/mvn was called by name: " + (Get-Content -Raw "$env:OUT\poison.log") }
+          if (Test-Path "C:\old") { $bad += "C:\old (the stale folder) was made" }
+          $venvs = Get-ChildItem -Recurse -Force $env:PLATFORM -Include ".venv","venv","pyvenv.cfg" -ErrorAction SilentlyContinue
+          if ($venvs) { $bad += "a virtual environment: " + ($venvs.FullName -join ", ") }
+          if (Select-String -Path "$env:OUT\*.txt" -Pattern "127\.0\.0\.1:9/simple|Traceback \(most recent call last\)" -List) { $bad += "a network attempt to the dead index, or a traceback, in the logs" }
+          if ($bad) { $bad | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
+
+      - uses: actions/upload-artifact@v4.6.2
+        if: failure()
+        with:
+          name: first-run-windows-${{ inputs.release }}
+          path: |
+            ${{ runner.temp }}\out
+            C:\Users\John Smith\drishti-envs
+          retention-days: 7
+
+  posix:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: linux-x64, run: true }
+          - { os: macos-latest, target: macos-arm64, run: "${{ inputs.macos }}" }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      PACK: drishti-platform-${{ inputs.release }}-wheels-${{ matrix.target }}-py313.zip
+    steps:
+      - uses: actions/setup-java@v4.7.1
+        if: matrix.run == true || matrix.run == 'true'
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/setup-python@v5.6.0
+        if: matrix.run == true || matrix.run == 'true'
+        with:
+          python-version: "3.13"
+      - name: The whole first run (python3.13 of the runner, no venv)
+        if: matrix.run == true || matrix.run == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          PY="$(command -v python3.13)"
+          export HOME="$RUNNER_TEMP/John Smith"
+          OUT="$RUNNER_TEMP/out"
+          OLD="$RUNNER_TEMP/old/drishti-orig"
+          PLATFORM="$HOME/IdeaProjects/drishti-platform (1)"
+          mkdir -p "$HOME/Downloads" "$PLATFORM" "$OUT"
+          gh release download "$REL" --repo "$GITHUB_REPOSITORY" --dir "$HOME/Downloads" \
+             --pattern "drishti-platform-$REL-source.zip" --pattern "$PACK"
+          unzip -q "$HOME/Downloads/drishti-platform-$REL-source.zip" -d "$PLATFORM"
+
+          # poison shims first on the PATH: any bare python/pip/git/mvn call fails loudly and is logged
+          mkdir -p "$RUNNER_TEMP/poison"
+          for n in python python3 pip pip3 git mvn; do printf '#!/bin/sh\necho "$0 $*" >> "%s/poison.log"\nexit 127\n' "$OUT" > "$RUNNER_TEMP/poison/$n"; chmod +x "$RUNNER_TEMP/poison/$n"; done
+          export PATH="$RUNNER_TEMP/poison:$PATH"
+
+          cd "$PLATFORM"
+          "$PY" build_all.py --skip-tests 2>&1 | tee "$OUT/build.txt"
+
+          # the owner installs the libraries himself (Drishti never installs anything): the pack, unzipped, then pip from requirements.txt
+          mkdir -p "$HOME/drishti-wheels" && unzip -q "$HOME/Downloads/$PACK" -d "$HOME/drishti-wheels"
+          (cd "$PLATFORM/drishti/drishti-console" && "$PY" -m pip install --no-index --find-links "$HOME/drishti-wheels" -r requirements.txt) 2>&1 | tee "$OUT/owner-pip.txt"
+          SITE="$("$PY" -c "import sysconfig;print(sysconfig.get_paths()['purelib'])")"
+          libs1="$(find "$SITE" -type f -name '*.py' -newer "$OUT/owner-pip.txt" | wc -l) $(ls "$SITE" | sha256sum)"
+
+          mkdir -p "$HOME/drishti-envs"
+          printf 'drishti.home=%s\ndrishti.data.dir=%s/data\ndrishti.python=%s/drishti-console/.venv/bin/python\n' "$OLD" "$OLD" "$OLD" > "$HOME/drishti-envs/dev.ini"
+          export DRISHTI_HOME="$OLD" DRISHTI_DATA_DIR="$OLD/data" DRISHTI_TMP_DIR="$OLD/data/tmp" PIP_REQUIRE_VIRTUALENV=true
+          export PIP_INDEX_URL=http://127.0.0.1:9/simple HTTP_PROXY=http://127.0.0.1:9 HTTPS_PROXY=http://127.0.0.1:9 NO_PROXY=
+
+          cd "$PLATFORM/drishti"
+          "$PY" tools/drishti.py setup 2>&1 | tee "$OUT/setup-1.txt"
+          [ "$libs1" = "$(find "$SITE" -type f -name '*.py' -newer "$OUT/owner-pip.txt" | wc -l) $(ls "$SITE" | sha256sum)" ] || { echo "::error::setup changed the Python's libraries: Drishti must never install"; exit 1; }
+          if grep -q '127\.0\.0\.1:9' "$OUT/setup-1.txt"; then echo "::error::setup tried the dead package index"; exit 1; fi
+          tree1="$(find "$HOME/drishti-envs" -type f -exec shasum -a 256 {} + | sort -k2)"
+          "$PY" tools/drishti.py setup 2>&1 | tee "$OUT/setup-2.txt"
+          [ "$tree1" = "$(find "$HOME/drishti-envs" -type f -exec shasum -a 256 {} + | sort -k2)" ] || { echo "::error::the second setup changed the settings folder"; exit 1; }
+
+          "$PY" tools/drishti.py lake demo --engine java 2>&1 | tee "$OUT/lake.txt"
+          "$PY" tools/drishti.py start all --demo 2>&1 | tee "$OUT/start.txt"
+          "$PY" tools/drishti.py doctor --acceptance 2>&1 | tee "$OUT/accept.txt"
+          grep -q "$VAR" "$OUT/accept.txt"
+          grep -q "$ES" "$OUT/accept.txt"
+          "$PY" tools/drishti.py status
+          "$PY" tools/drishti.py stop all
+
+          # the bare console against the server of start server --demo
+          "$PY" tools/drishti.py start server --demo --background
+          "$PY" drishti-console/run_drishti_web.py 2> "$OUT/bare.txt" &
+          BARE=$!
+          ok=1; for i in $(seq 60); do if curl -fsS -o /dev/null http://localhost:17480; then ok=0; break; fi; sleep 2; done
+          rc=0; "$PY" tools/drishti.py doctor --acceptance --wait 120 2>&1 | tee "$OUT/accept-bare.txt" || rc=$?
+          kill "$BARE" || true
+          "$PY" tools/drishti.py stop all
+          [ "$ok" = 0 ] && [ "$rc" = 0 ] || { echo "::error::the bare console did not answer or did not reach the server"; exit 1; }
+
+          bad=0
+          [ ! -e "$OUT/poison.log" ] || { echo "::error::called by name: $(cat "$OUT/poison.log")"; bad=1; }
+          [ ! -e "$RUNNER_TEMP/old" ] || { echo "::error::the stale folder was made"; bad=1; }
+          if find "$PLATFORM" \( -name .venv -o -name venv -o -name pyvenv.cfg \) | grep -q .; then echo "::error::a virtual environment under the unzip folder"; bad=1; fi
+          if grep -lE '127\.0\.0\.1:9/simple|Traceback \(most recent call last\)' "$OUT"/*.txt; then echo "::error::a network attempt to the dead index, or a traceback"; bad=1; fi
+          exit $bad
+      - uses: actions/upload-artifact@v4.6.2
+        if: failure() && (matrix.run == true || matrix.run == 'true')
+        with:
+          name: first-run-${{ matrix.target }}-${{ inputs.release }}
+          path: ${{ runner.temp }}/out
+          retention-days: 7
