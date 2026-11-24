@@ -171,7 +171,7 @@ jobs:
           if (Select-String -Path "$env:OUT\*.txt" -Pattern "127\.0\.0\.1:9/simple|Traceback \(most recent call last\)" -List) { $bad += "a network attempt to the dead index, or a traceback, in the logs" }
           if ($bad) { $bad | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
 
-      - name: Gather the logs (one folder: an artifact cannot span two drives)
+      - name: "Gather the logs (one folder: an artifact cannot span two drives)"
         if: failure()
         run: |
           Copy-Item -Recurse -Force -ErrorAction SilentlyContinue "C:\Users\johnsmith\drishti-envs" "$env:OUT\drishti-envs"
