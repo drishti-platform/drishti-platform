@@ -8,9 +8,9 @@
 <i>Your data is a treasury;</i> <b>Drishti is its sentinel.</b></p>
 
 <p align="center">
-  <a href="COMPATIBILITY.md"><img alt="platform release" src="https://img.shields.io/badge/platform-i7i-1f6feb"></a>
+  <a href="COMPATIBILITY.md"><img alt="platform release" src="https://img.shields.io/badge/platform-i7j-1f6feb"></a>
   <img alt="Java 21" src="https://img.shields.io/badge/Java-21-orange">
-  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
+  <img alt="Python 3.13" src="https://img.shields.io/badge/Python-3.13-3776ab">
   <img alt="Windows | Linux | macOS" src="https://img.shields.io/badge/runs%20on-Windows%20%7C%20Linux%20%7C%20macOS-555">
   <img alt="licence" src="https://img.shields.io/badge/licence-proprietary-lightgrey">
 </p>
@@ -26,7 +26,7 @@ index: what each one is, which versions go together, and the scripts that fetch 
 > **Getting the code.** GitHub's green **Code → Download ZIP** on this page gives **only this index** (the scripts and this
 > README), not the products. For **everything in one download**, open **[Releases](https://github.com/drishti-platform/drishti-platform/releases)**
 > and download **`drishti-platform-<release>-source.zip`**: every product's source at its release tag, the platform `pom.xml` and its IntelliJ launchers (`run-configs/`), Drishti's pinned Lake Python wheel already in `drishti/lib/wheels/`, `build_all.py` and checksums.
-> Unzip it and run `python build_all.py --bundle .` (needs JDK 21 and Python 3.10+, nothing else). With git installed you can instead run
+> Then follow **`START_HERE_WINDOWS.pdf`** (or `_LINUX`, `_MACOS`) at the top of the zip. With git installed you can instead run
 > `python clone_all.py --release <release>` from this index.
 
 ## The products
@@ -88,69 +88,70 @@ versions that belong together are in [COMPATIBILITY.md](COMPATIBILITY.md); the m
 - **Standards, not workarounds:** data stays 100% Delta and Iceberg compliant, read and written through the official libraries.
 - **Plain to run:** Java 21 and Python only, on Windows, Linux and macOS; nothing to install from a CDN, no native executables.
 
-## Install order
+## Quick start (Windows; Linux and macOS: `python3.13` and `/`)
 
-Tools, then Rachana, then Lake, then Drishti. Each library repository installs its jars into the Maven repository (`~/.m2`) from its
-release tag, and the next one finds them there. `build_all.py` does exactly this.
+Download two files from the newest [release](https://github.com/drishti-platform/drishti-platform/releases): the source zip and the
+wheel pack for your computer. Unzip the source into `drishti-platform\` and the wheels into `%USERPROFILE%\drishti-wheels\`, then:
 
-## Local layout
+```
+cd drishti-platform
+py -3.13 build_all.py --skip-tests                                   # tools, Rachana, Lake, Drishti, in order
+cd drishti\drishti-console
+py -3.13 -m pip install --no-index --find-links "%USERPROFILE%\drishti-wheels" -r requirements.txt
+py -3.13 -m pip install --no-index --find-links "%USERPROFILE%\drishti-wheels" -r ..\config\compute\locks\python.lock
+cd ..
+py -3.13 tools\drishti.py setup                                      # checks only; ends "Drishti is ready."
+py -3.13 tools\drishti.py lake demo --engine java                    # the demo lakes, once
+py -3.13 tools\drishti.py start all --demo                           # server and console
+py -3.13 tools\drishti.py doctor --acceptance                        # PASS: VaR 167,372,692, ES 210,131,972
+```
 
-All repositories sit side by side in one parent folder:
+Open `http://localhost:17480` (sign in `drishti-dev-admin` / `drishti-dev-admin123`). Drishti never creates a Python environment and
+never installs packages: the two pip lines are yours, into the Python you choose (use one just for Drishti if other work shares it).
+The same steps in IntelliJ IDEA and PyCharm, with what you should see at each step: `START_HERE_*.pdf` and [IDE_GUIDE.md](IDE_GUIDE.md).
+Running Drishti for real users (Linux): `drishti/docs/PRODUCTION_DEPLOYMENT.md`.
+
+## IDE launchers
+
+Every launcher sits in a visible `run-configs/` folder, in a group named **IDE-part-purpose**:
+
+| Group | Where | What |
+|---|---|---|
+| **IntelliJ-platform-build** | `drishti-platform` (IntelliJ IDEA) | `platform-clean-install`: the same build as `build_all.py` |
+| **IntelliJ-drishti-build / -run / -test** | `drishti` (IntelliJ IDEA) | build Drishti, run the server (demo, QA, samples), tests |
+| **PyCharm-console-setup / -data / -run / -check** | `drishti/drishti-console` (PyCharm) | setup, demo lakes and loading, the console, acceptance |
+| **IntelliJ- / PyCharm-tools, -rachana, -lake, -elements-…** | each product's folder | that product's build, run, test, check, install |
+
+From a terminal, `py -3.13 tools\drishti.py launchers --list` shows Drishti's launchers with their exact commands and
+`launchers --run "<name>"` runs one.
+
+## Install order and layout
+
+Tools, then Rachana, then Lake, then Drishti: each installs its jars into the Maven repository (`~/.m2`) and the next one finds them
+there. All repositories sit side by side in one parent folder:
 
 ```
 ~/IdeaProjects/drishti-platform/            (Windows: C:\Users\<you>\IdeaProjects\drishti-platform\)
-    drishti-tools/  drishti-rachana/  drishti-lake/  drishti-elements/  drishti/  drishti-platform/ (this index)
+    pom.xml  build_all.py  run-configs/  START_HERE_*.pdf  IDE_GUIDE.md
+    drishti-tools/  drishti-rachana/  drishti-lake/  drishti-elements/  drishti/
 ```
 
-## Get and build (Python 3.10+, JDK 21; no bash, no .exe)
+## The scripts in this repository
 
-```
-python clone_all.py --release i7i            # clone or update every repository at the release's tags (or --develop)
-python build_all.py --release i7i            # build and install in order, then build Drishti
-python build_all.py --release i7i --repo-local --skip-tests   # dedicated Maven repository (<parent>/.m2-drishti), no tests
-```
+Standard library only (Python 3.10 or later runs them); no bash, no `.exe`.
 
-`--parent <folder>` changes the parent folder (default: the folder above this repository). Each library is built with its own
-`mvnw` / `mvnw.cmd`.
-
-**Or with Maven alone:** `clone_all.py` also puts `pom.xml` in the parent folder (it is at the top of the source zip too). In the parent folder, `mvn` builds tools, Rachana, Lake and Drishti in that order, each with its own wrapper in its own folder
-(the default goals are `clean install`; `mvn -DskipTests` for a quick build). It stops at the first product that fails. On Windows
-the pom trusts the Windows certificate store for the product builds (`-Djavax.net.ssl.trustStoreType=Windows-ROOT`), so a corporate
-proxy's root certificate is accepted.
-
-**In IntelliJ IDEA and PyCharm:** [IDE_GUIDE.md](IDE_GUIDE.md) takes a fresh machine from the release zip to a running server and console with nothing to edit by hand (also at the top of the zip, and placed beside `pom.xml` by `clone_all.py`). The launchers are in the parent folder's `run-configs/` (group **IntelliJ-platform-build**):
-
-| Launcher | What it runs |
+| Script | Does |
 |---|---|
-| `platform-clean-install` | Windows: clean install of tools, Rachana, Lake and Drishti, no tests; the Windows certificate store trusted by IntelliJ's Maven too (VM option) |
-| `platform-clean-install (Linux, macOS)` | the same without the Windows option |
+| `clone_all.py --release <name>` | clones or updates every repository at that release's tags (`--develop` for the develop branches), places `pom.xml`, `run-configs/`, the guides |
+| `build_all.py [--skip-tests] [--repo-local]` | builds and installs in order (from an unzipped source zip with no option); on Windows trusts the Windows certificate store; Maven gets a space-free temporary folder |
+| `make_bundle.py --release <name>` | the source zip: every repository at its tag, the top files and checksums (no `.git`, no IDE folders) |
+| `make_wheels.py --release <name> --target <os>` | the offline wheel pack: every wheel the console and the server's Python work need on that system, Python 3.13 |
+| `make_start_here.py [--check]` | writes the three START_HERE pages from one template |
 
-Set the project SDK to a JDK 21 first (File → Project Structure → Project). The project only builds; open each product as its own
-project to work on its code.
-
-## Source bundle
-
-`python make_bundle.py --release i7i` writes `drishti-platform-i7i-source.zip`: every repository's source at its tag (`git archive`),
-this README, `build_all.py` and `SHA-256SUMS`. Unzip, run `python build_all.py --bundle .`, done; it needs no network except Maven
-Central.
-
-## Offline wheel packs
-
-`python make_wheels.py --release i7i --parent <folder> --out <folder> [--target windows-x64|linux-x64|macos-arm64|macos-x64|all]`
-writes `drishti-platform-<release>-wheels-<target>-py313.zip` (Python 3.13 by default, `--python` to change): every binary wheel the
-console needs on that platform (its `requirements.txt` at the release tag) plus the pinned Lake wheel and its dependencies and the server's compute lock (`python.lock`),
-with `README.txt` and `SHA256SUMS`. On a machine without network, `py tools\drishti.py setup --system --wheels <zip or unzipped
-folder>` installs from it. The script refuses, naming the requirement, when one has no binary wheel for a target.
-
-## Tests
-
-`uv run --with pytest pytest tests` (the logic of the scripts, against a fake repository set).
-
-## Build and run in the IDE
-
-IntelliJ and PyCharm: open the repository root; the launchers are in `run-configs/` (group **IntelliJ-platform-build**, names start with `Platform:`). VS Code: File,
-Open Workspace from File, `drishti-platform.code-workspace`.
+`pom.xml` is the same build for Maven and IntelliJ (`mvn -DskipTests` in the parent folder). Tests: `python3 -m pytest tests`.
+VS Code: open `drishti-platform.code-workspace`.
 
 ## Links
 
-Organisation: https://github.com/drishti-platform. Licence: [LICENSE](LICENSE); proprietary, all rights reserved.
+Organisation: https://github.com/drishti-platform. Versions that go together: [COMPATIBILITY.md](COMPATIBILITY.md). Licence:
+[LICENSE](LICENSE); proprietary, all rights reserved.

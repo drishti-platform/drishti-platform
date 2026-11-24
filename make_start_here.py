@@ -29,6 +29,7 @@ OS = {
                   "  as it is: it never makes a virtual environment and never installs anything into it by itself. If Python is installed for all users under `C:\\Program Files`,\n"
                   "  ask IT to run step 4 for you as an administrator, or use a Python installed just for you.",
         "python_seen": "`C:\\Users\\<you>\\AppData\\Local\\Programs\\Python\\Python313\\python.exe`",
+        "admin_note": " If this Python is installed for all users (under `C:\\Program Files`), open the Command Prompt **as administrator**\nfor the two install commands, or add `--user` to them.",
         "interp": "**Settings → Project → Python Interpreter → Add Interpreter → Add Local Interpreter → System Interpreter**: choose the\n"
                   "   `python.exe` you noted in step 4. Click **OK**, and wait until the progress bar at the bottom finishes.",
         "venv_offer": "If PyCharm offers to create a virtual environment, click **Cancel**: Drishti uses the Python from step 4.",
@@ -47,6 +48,7 @@ OS = {
                   "  or a virtual environment you made yourself. The operating system's own Python usually refuses extra libraries; Drishti\n"
                   "  never makes an environment itself: run the commands below with the Python you chose.",
         "python_seen": "`/opt/python3.13/bin/python3.13`",
+        "admin_note": "",
         "interp": "**Settings → Project → Python Interpreter → Add Interpreter → Add Local Interpreter**: choose the Python you noted in\n"
                   "   step 4 (**Select existing**). Click **OK**, and wait until the progress bar at the bottom finishes.",
         "venv_offer": "If PyCharm offers to create a new environment, click **Cancel**: Drishti uses the Python from step 4.",
@@ -65,6 +67,7 @@ OS = {
         "python": "**Python 3.13** from python.org (`python3.13`), or a virtual environment you made yourself from it. Drishti never\n"
                   "  makes an environment itself: run the commands below with the Python you chose.",
         "python_seen": "`/Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13`",
+        "admin_note": "",
         "interp": "**Settings → Project → Python Interpreter → Add Interpreter → Add Local Interpreter**: choose the Python you noted in\n"
                   "   step 4 (**Select existing**). Click **OK**, and wait until the progress bar at the bottom finishes.",
         "venv_offer": "If PyCharm offers to create a new environment, click **Cancel**: Drishti uses the Python from step 4.",
@@ -94,8 +97,8 @@ def render(key: str) -> str:
     return HEADER + NOTICE + f"""
 # Start here: Drishti on {o['name']}
 
-These steps take {o['pc']} from the downloads to Drishti running in your browser. Nothing needs to be edited by hand; you type one
-command in step 4. Each step says what you should see. ({others} beside this file are the same steps for the other systems.)
+These steps take {o['pc']} from the downloads to Drishti running in your browser. Nothing needs to be edited by hand; you type a few
+commands in step 4. Each step says what you should see. ({others} beside this file are the same steps for the other systems.)
 
 ## What you need first
 
@@ -105,6 +108,7 @@ Ask your IT team to install these once, if they are not already there:
 - {o['python']}
 - **IntelliJ IDEA** and **PyCharm** (the free Community editions are enough).
 - Step 3 needs the company network (it fetches the build tools once).
+- **At least 20 GB free** on the disk that holds the `drishti-platform` folder (the VaR engine checks before it builds its working files).
 
 **Two programs; the launcher groups say which program and which part.** IntelliJ IDEA runs the Java side: groups **IntelliJ-platform-build**
 (the platform build) and **IntelliJ-drishti-build / -run / -test** (Drishti). PyCharm runs the Python side: groups **PyCharm-console-setup / -data / -run / -check** (the console
@@ -122,8 +126,8 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 1. Unzip the **source** zip into `{plat}{o['sep']}`.
    *You should see* the folders `drishti`, `drishti-lake`, `drishti-rachana`, `drishti-tools`, `drishti-elements`, and the files `pom.xml`
    and this guide.
-2. Unzip the **wheels** zip into `{wheels}{o['sep']}`.
-   *You should see* many files ending in `.whl` and a `README.txt` directly in that folder.
+2. Unzip the **wheels** zip into `{wheels}{o['sep']}` (Drishti never opens the zip itself: leaving it zipped in Downloads is the most
+   common reason step 4 fails). *You should see* many files ending in `.whl` and a `README.txt` directly in that folder.
 
 ## 3. Build Drishti (IntelliJ IDEA)
 
@@ -133,12 +137,14 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 3. Wait until the progress bar at the bottom finishes (indexing). Then, at the top right, open the list of run configurations, choose
    **platform-clean-install** (folder **IntelliJ-platform-build**), and click the green **Run** arrow.
 4. Wait. It takes several minutes the first time.
-   *You should see* `BUILD SUCCESS` at the end of the output.
+   *You should see* `BUILD SUCCESS` at the end of the output. Do this **before** step 4: setup checks that the server is built.
 
 ## 4. Prepare Python (once)
 
 Drishti never installs anything into your Python: you install its libraries yourself, from the wheels folder, with two commands
-(the console's libraries, then the server's compute libraries).
+(the console's libraries, then the server's compute libraries). The second one sets exact versions of pandas, pyarrow and tzdata: if
+other work of yours uses this same Python and needs other versions, install a **second Python 3.13 just for Drishti** and use that one
+everywhere below (and in PyCharm).{o['admin_note']}
 
 1. Open {o['terminal']}.
 2. Install the libraries (replace `<you>` with your user name):
@@ -204,11 +210,25 @@ cd ..
 {o['py']} {tool} start all --demo
 ```
 
-Then step 7. `{o['py']} {tool} status` shows what runs; `{o['py']} {tool} stop all` stops the server and the console.
+Then step 7, or check everything at once: `{o['py']} {tool} doctor --acceptance` prints **PASS** with the VaR and ES.
+`{o['py']} {tool} status` shows what runs; `{o['py']} {tool} stop all` stops the server and the console.
+
+Every IDE launcher can also run from here: `{o['py']} {tool} launchers --list` shows them all with their groups and commands, and
+`{o['py']} {tool} launchers --run "Drishti: run server (demo)"` runs exactly what that launcher runs.
 
 ## If something goes wrong
 
-Take a photo or screenshot of the whole window and send it to your Drishti contact. The step number above helps. More detail for
+Setup's `[FAIL]` lines, the ones people meet most:
+
+| Setup says | Means | Do |
+|---|---|---|
+| `[FAIL] libraries … is not installed` or `… is installed, the requirement is …` | step 4's two install commands have not run in this Python | run them (step 4.2), then setup again |
+| `[FAIL] wheel pack … is still zipped` | the wheels zip was not unzipped | unzip it into `{wheels}` (step 2.2) |
+| `build all` in **Next steps** | the server is not built yet | step 3 (or `{o['build_cli']}`), then setup again |
+| `[FAIL] java …` | no Java 21, or an older one | install Java 21 and set `JAVA_HOME` |
+| VaR answers *not enough free disk* | less than 20 GB free | free some space (or set `drishti.disk.min-free-gb=10` in `drishti-envs{o['sep']}dev.ini`) |
+
+Otherwise take a photo or screenshot of the whole window and send it to your Drishti contact. The step number above helps. More detail for
 technical readers: `IDE_GUIDE.md` (beside this file) and `drishti{o['sep']}docs{o['sep']}guides{o['sep']}IDE_GUIDE.md`. Running Drishti
 for real users on a server: `drishti{o['sep']}docs{o['sep']}PRODUCTION_DEPLOYMENT.md` (Linux).
 """

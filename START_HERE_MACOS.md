@@ -3,8 +3,8 @@
 
 # Start here: Drishti on macOS
 
-These steps take a Mac from the downloads to Drishti running in your browser. Nothing needs to be edited by hand; you type one
-command in step 4. Each step says what you should see. (`START_HERE_WINDOWS.md` and `START_HERE_LINUX.md` beside this file are the same steps for the other systems.)
+These steps take a Mac from the downloads to Drishti running in your browser. Nothing needs to be edited by hand; you type a few
+commands in step 4. Each step says what you should see. (`START_HERE_WINDOWS.md` and `START_HERE_LINUX.md` beside this file are the same steps for the other systems.)
 
 ## What you need first
 
@@ -15,6 +15,7 @@ Ask your IT team to install these once, if they are not already there:
   makes an environment itself: run the commands below with the Python you chose.
 - **IntelliJ IDEA** and **PyCharm** (the free Community editions are enough).
 - Step 3 needs the company network (it fetches the build tools once).
+- **At least 20 GB free** on the disk that holds the `drishti-platform` folder (the VaR engine checks before it builds its working files).
 
 **Two programs; the launcher groups say which program and which part.** IntelliJ IDEA runs the Java side: groups **IntelliJ-platform-build**
 (the platform build) and **IntelliJ-drishti-build / -run / -test** (Drishti). PyCharm runs the Python side: groups **PyCharm-console-setup / -data / -run / -check** (the console
@@ -33,8 +34,8 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 1. Unzip the **source** zip into `/Users/<you>/IdeaProjects/drishti-platform/`.
    *You should see* the folders `drishti`, `drishti-lake`, `drishti-rachana`, `drishti-tools`, `drishti-elements`, and the files `pom.xml`
    and this guide.
-2. Unzip the **wheels** zip into `/Users/<you>/drishti-wheels/`.
-   *You should see* many files ending in `.whl` and a `README.txt` directly in that folder.
+2. Unzip the **wheels** zip into `/Users/<you>/drishti-wheels/` (Drishti never opens the zip itself: leaving it zipped in Downloads is the most
+   common reason step 4 fails). *You should see* many files ending in `.whl` and a `README.txt` directly in that folder.
 
 ## 3. Build Drishti (IntelliJ IDEA)
 
@@ -44,12 +45,14 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 3. Wait until the progress bar at the bottom finishes (indexing). Then, at the top right, open the list of run configurations, choose
    **platform-clean-install** (folder **IntelliJ-platform-build**), and click the green **Run** arrow.
 4. Wait. It takes several minutes the first time.
-   *You should see* `BUILD SUCCESS` at the end of the output.
+   *You should see* `BUILD SUCCESS` at the end of the output. Do this **before** step 4: setup checks that the server is built.
 
 ## 4. Prepare Python (once)
 
 Drishti never installs anything into your Python: you install its libraries yourself, from the wheels folder, with two commands
-(the console's libraries, then the server's compute libraries).
+(the console's libraries, then the server's compute libraries). The second one sets exact versions of pandas, pyarrow and tzdata: if
+other work of yours uses this same Python and needs other versions, install a **second Python 3.13 just for Drishti** and use that one
+everywhere below (and in PyCharm).
 
 1. Open **Terminal** (Applications → Utilities → Terminal).
 2. Install the libraries (replace `<you>` with your user name):
@@ -117,10 +120,24 @@ python3.13 tools/drishti.py lake demo --engine java
 python3.13 tools/drishti.py start all --demo
 ```
 
-Then step 7. `python3.13 tools/drishti.py status` shows what runs; `python3.13 tools/drishti.py stop all` stops the server and the console.
+Then step 7, or check everything at once: `python3.13 tools/drishti.py doctor --acceptance` prints **PASS** with the VaR and ES.
+`python3.13 tools/drishti.py status` shows what runs; `python3.13 tools/drishti.py stop all` stops the server and the console.
+
+Every IDE launcher can also run from here: `python3.13 tools/drishti.py launchers --list` shows them all with their groups and commands, and
+`python3.13 tools/drishti.py launchers --run "Drishti: run server (demo)"` runs exactly what that launcher runs.
 
 ## If something goes wrong
 
-Take a photo or screenshot of the whole window and send it to your Drishti contact. The step number above helps. More detail for
+Setup's `[FAIL]` lines, the ones people meet most:
+
+| Setup says | Means | Do |
+|---|---|---|
+| `[FAIL] libraries … is not installed` or `… is installed, the requirement is …` | step 4's two install commands have not run in this Python | run them (step 4.2), then setup again |
+| `[FAIL] wheel pack … is still zipped` | the wheels zip was not unzipped | unzip it into `/Users/<you>/drishti-wheels` (step 2.2) |
+| `build all` in **Next steps** | the server is not built yet | step 3 (or `python3.13 build_all.py --skip-tests`), then setup again |
+| `[FAIL] java …` | no Java 21, or an older one | install Java 21 and set `JAVA_HOME` |
+| VaR answers *not enough free disk* | less than 20 GB free | free some space (or set `drishti.disk.min-free-gb=10` in `drishti-envs/dev.ini`) |
+
+Otherwise take a photo or screenshot of the whole window and send it to your Drishti contact. The step number above helps. More detail for
 technical readers: `IDE_GUIDE.md` (beside this file) and `drishti/docs/guides/IDE_GUIDE.md`. Running Drishti
 for real users on a server: `drishti/docs/PRODUCTION_DEPLOYMENT.md` (Linux).
