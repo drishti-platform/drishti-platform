@@ -72,7 +72,10 @@ jobs:
         run: |
           py -0p
           py -3.13 -c "import sys; print(sys.executable, sys.version)"
-          if (Get-Command python.exe -ErrorAction SilentlyContinue | Where-Object { $_.Source -notmatch "poison" }) { throw "a real python.exe is on the PATH" }
+          # what a bare `python` resolves to must be the poison shim (a real python.exe further down, e.g. the Store stub in WindowsApps, is
+          # realistic and stays: Drishti must never reach it)
+          $first = (Get-Command python -ErrorAction SilentlyContinue | Select-Object -First 1).Source
+          if ($first -notmatch "poison") { throw "a bare python resolves to $first, not the poison shim" }
 
       - name: Download the source zip and the wheel pack; unzip the source only
         run: |
