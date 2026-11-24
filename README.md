@@ -15,10 +15,14 @@
   <img alt="licence" src="https://img.shields.io/badge/licence-proprietary-lightgrey">
 </p>
 
-**The real-time risk and analytics layer that sits next to a bank's trading systems.** Drishti loads trade-grain data from the
-systems a bank already runs, aggregates it on demand for any scope, from the whole bank to an ad-hoc set of trades, and explains every
-figure: where it came from, how it was calculated and why it moved. It is not an order or execution system, and it never prices: it
-shows what its sources supply and says exactly what is missing.
+**Live, explainable analytics on the data you already have, in any domain.** Drishti reads data where it lives (Delta and Iceberg
+lakes, files, databases, streams), aggregates it on demand for any scope, from everything down to a hand-picked handful of rows, and
+explains every figure: where it came from, how it was calculated and why it moved. Screens are described, not coded, in one grammar.
+Drishti never invents a number: it shows what its sources supply and says exactly what is missing.
+
+What a domain needs (its data shapes, measures, screens and rules) comes as a **module**. Banking risk is the first and deepest (VaR,
+ES, exposure, the pre-deal check, connectors to trading systems); capital markets, economic and public-sector data, and genomics sit
+beside it. A new domain is a new module, not a new product.
 
 The platform is **five products, each useful on its own**, released separately and built in one order. This repository is their
 index: what each one is, which versions go together, and the scripts that fetch and build them all. No product code lives here.
@@ -35,8 +39,8 @@ index: what each one is, which versions go together, and the scripts that fetch 
 <tr>
 <td width="200" align="center"><img src="brand/drishti-logo.png" alt="Drishti" width="150"></td>
 <td><b><a href="https://github.com/drishti-platform/drishti">Drishti</a></b>: <b>any data, any domain, one grammar.</b> The server, the
-console and the modules: connectors and lakes, the cluster, screens written as Sutras, the pivot and BI engines, VaR, ES, exposure and
-the pre-deal check, roles, masks, four eyes and an audit trail.</td>
+console and the domain modules: connectors and lakes, the cluster, screens written as Sutras, the pivot and BI engines, roles, masks,
+four eyes and an audit trail; domains such as banking risk (VaR, ES, exposure, the pre-deal check), markets, economics and genomics.</td>
 </tr>
 <tr>
 <td align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="brand/drishti_rachana-logo.svg"><img src="brand/drishti_rachana-logo-light.svg" alt="Drishti Rachana" width="170"></picture></td>
