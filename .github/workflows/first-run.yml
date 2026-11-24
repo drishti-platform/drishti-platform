@@ -171,14 +171,16 @@ jobs:
           if (Select-String -Path "$env:OUT\*.txt" -Pattern "127\.0\.0\.1:9/simple|Traceback \(most recent call last\)" -List) { $bad += "a network attempt to the dead index, or a traceback, in the logs" }
           if ($bad) { $bad | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
 
+      - name: Gather the logs (one folder: an artifact cannot span two drives)
+        if: failure()
+        run: |
+          Copy-Item -Recurse -Force -ErrorAction SilentlyContinue "C:\Users\johnsmith\drishti-envs" "$env:OUT\drishti-envs"
+          Copy-Item -Recurse -Force -ErrorAction SilentlyContinue "C:\Users\johnsmith\IdeaProjects\drishti-platform\drishti\data\logs" "$env:OUT\logs"
       - uses: actions/upload-artifact@v4.6.2
         if: failure()
         with:
           name: first-run-windows-${{ inputs.release }}
-          path: |
-            ${{ runner.temp }}\out
-            C:\Users\johnsmith\drishti-envs
-            C:\Users\johnsmith\IdeaProjects\drishti-platform\drishti\data\logs
+          path: ${{ runner.temp }}\out
           retention-days: 7
 
   posix:
@@ -274,6 +276,6 @@ jobs:
           name: first-run-${{ matrix.target }}-${{ inputs.release }}
           path: |
             ${{ runner.temp }}/out
-            ${{ runner.temp }}/johnsmith/drishti-envs
-            ${{ runner.temp }}/johnsmith/IdeaProjects/drishti-platform/drishti/data/logs
+            ${{ runner.temp }}/johnsmith/drishti-envs/
+            ${{ runner.temp }}/johnsmith/IdeaProjects/drishti-platform/drishti/data/logs/
           retention-days: 7
