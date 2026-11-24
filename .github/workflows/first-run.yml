@@ -153,7 +153,7 @@ jobs:
           $py = (py -3.13 -c "import sys; print(sys.executable)")
           $bare = Start-Process -PassThru -NoNewWindow $py -ArgumentList "drishti-console\run_drishti_web.py" -RedirectStandardError "$env:OUT\bare.txt"
           $ok = $false
-          foreach ($i in 1..60) { try { if ((Invoke-WebRequest "http://localhost:17480" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200) { $ok = $true; break } } catch { Start-Sleep 2 } }
+          foreach ($i in 1..60) { try { if ((Invoke-WebRequest "http://127.0.0.1:17480" -UseBasicParsing -NoProxy -TimeoutSec 5).StatusCode -eq 200) { $ok = $true; break } } catch { Start-Sleep 2 } }
           py -3.13 tools\drishti.py --profile demo doctor --acceptance --wait 120 2>&1 | Tee-Object "$env:OUT\accept-bare.txt"
           $rc = $LASTEXITCODE
           Stop-Process -Id $bare.Id -Force
