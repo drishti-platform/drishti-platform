@@ -8,7 +8,7 @@
 <i>Your data is a treasury;</i> <b>Drishti is its sentinel.</b></p>
 
 <p align="center">
-  <a href="COMPATIBILITY.md"><img alt="platform release" src="https://img.shields.io/badge/platform-i7f-1f6feb"></a>
+  <a href="COMPATIBILITY.md"><img alt="platform release" src="https://img.shields.io/badge/platform-i7g-1f6feb"></a>
   <img alt="Java 21" src="https://img.shields.io/badge/Java-21-orange">
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776ab">
   <img alt="Windows | Linux | macOS" src="https://img.shields.io/badge/runs%20on-Windows%20%7C%20Linux%20%7C%20macOS-555">
@@ -105,9 +105,9 @@ All repositories sit side by side in one parent folder:
 ## Get and build (Python 3.10+, JDK 21; no bash, no .exe)
 
 ```
-python clone_all.py --release i7f            # clone or update every repository at the release's tags (or --develop)
-python build_all.py --release i7f            # build and install in order, then build Drishti
-python build_all.py --release i7f --repo-local --skip-tests   # dedicated Maven repository (<parent>/.m2-drishti), no tests
+python clone_all.py --release i7g            # clone or update every repository at the release's tags (or --develop)
+python build_all.py --release i7g            # build and install in order, then build Drishti
+python build_all.py --release i7g --repo-local --skip-tests   # dedicated Maven repository (<parent>/.m2-drishti), no tests
 ```
 
 `--parent <folder>` changes the parent folder (default: the folder above this repository). Each library is built with its own
@@ -130,13 +130,13 @@ project to work on its code.
 
 ## Source bundle
 
-`python make_bundle.py --release i7f` writes `drishti-platform-i7f-source.zip`: every repository's source at its tag (`git archive`),
+`python make_bundle.py --release i7g` writes `drishti-platform-i7g-source.zip`: every repository's source at its tag (`git archive`),
 this README, `build_all.py` and `SHA-256SUMS`. Unzip, run `python build_all.py --bundle .`, done; it needs no network except Maven
 Central.
 
 ## Offline wheel packs
 
-`python make_wheels.py --release i7f --parent <folder> --out <folder> [--target windows-x64|linux-x64|macos-arm64|macos-x64|all]`
+`python make_wheels.py --release i7g --parent <folder> --out <folder> [--target windows-x64|linux-x64|macos-arm64|macos-x64|all]`
 writes `drishti-platform-<release>-wheels-<target>-py313.zip` (Python 3.13 by default, `--python` to change): every binary wheel the
 console needs on that platform (its `requirements.txt` at the release tag) plus the pinned Lake wheel and its dependencies and the server's compute lock (`python.lock`),
 with `README.txt` and `SHA256SUMS`. On a machine without network, `py tools\drishti.py setup --system --wheels <zip or unzipped

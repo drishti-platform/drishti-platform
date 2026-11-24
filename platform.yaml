@@ -37,19 +37,12 @@ repos:
 # that will exist at the release; make_bundle.py refuses a tag that does not exist yet.
 releases:
   i7g:
-    status: candidate
-    tools: v1.1.0
-    rachana: v1.0.1
-    lake: v0.9.1
-    elements: v3.3.2
-    drishti: release/i7g
-  i7f:
     status: released
     tools: v1.1.0
     rachana: v1.0.1
     lake: v0.9.1
     elements: v3.3.2
-    drishti: v2.9.11.i_7f
+    drishti: v2.9.11.i_7g
   i7b:
     status: released
     tools: v1.1.0
