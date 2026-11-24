@@ -99,8 +99,10 @@ jobs:
           $wheels = "$env:USERPROFILE\drishti-wheels"
           New-Item -ItemType Directory -Force $wheels | Out-Null
           & "$env:SystemRoot\System32\tar.exe" -xf "$env:DL\$env:PACK" -C $wheels
-          py -3.13 -m pip install --no-index --find-links "$wheels" -r requirements.txt -r ..\config\compute\locks\python.lock 2>&1 | Tee-Object "$env:OUT\owner-pip.txt"
-          if ($LASTEXITCODE) { throw "the owner's pip install from the wheel pack failed" }
+          py -3.13 -m pip install --no-index --find-links "$wheels" -r requirements.txt 2>&1 | Tee-Object "$env:OUT\owner-pip.txt"
+          if ($LASTEXITCODE) { throw "the owner's pip install (requirements.txt) from the wheel pack failed" }
+          py -3.13 -m pip install --no-index --find-links "$wheels" -r ..\config\compute\locks\python.lock 2>&1 | Tee-Object -Append "$env:OUT\owner-pip.txt"
+          if ($LASTEXITCODE) { throw "the owner's pip install (python.lock) from the wheel pack failed" }
 
       - name: Plant stale left-overs for every later step
         run: |
@@ -220,7 +222,7 @@ jobs:
 
           # the owner installs the libraries himself (Drishti never installs anything): the pack, unzipped, then pip from requirements.txt
           mkdir -p "$HOME/drishti-wheels" && unzip -q "$HOME/Downloads/$PACK" -d "$HOME/drishti-wheels"
-          (cd "$PLATFORM/drishti/drishti-console" && "$PY" -m pip install --no-index --find-links "$HOME/drishti-wheels" -r requirements.txt -r ../config/compute/locks/python.lock) 2>&1 | tee "$OUT/owner-pip.txt"
+          (cd "$PLATFORM/drishti/drishti-console" && "$PY" -m pip install --no-index --find-links "$HOME/drishti-wheels" -r requirements.txt && "$PY" -m pip install --no-index --find-links "$HOME/drishti-wheels" -r ../config/compute/locks/python.lock) 2>&1 | tee "$OUT/owner-pip.txt"
           SITE="$("$PY" -c "import sysconfig;print(sysconfig.get_paths()['purelib'])")"
           libs1="$(find "$SITE" -type f -name '*.py' -newer "$OUT/owner-pip.txt" | wc -l) $(ls "$SITE" | sha256sum)"
 
