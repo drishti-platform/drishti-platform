@@ -25,7 +25,7 @@ index: what each one is, which versions go together, and the scripts that fetch 
 
 > **Getting the code.** GitHub's green **Code → Download ZIP** on this page gives **only this index** (the scripts and this
 > README), not the products. For **everything in one download**, open **[Releases](https://github.com/drishti-platform/drishti-platform/releases)**
-> and download **`drishti-platform-<release>-source.zip`**: every product's source at its release tag, the platform `pom.xml` and its IntelliJ launchers (`run-configs/`), Drishti's pinned Lake Python wheel already in `drishti/lib/wheels/`, `build_all.py` and checksums.
+> and download **`drishti-platform-<release>-source.zip`**: every product's source at its release tag, the platform `pom.xml` and its IntelliJ launchers (`.idea/runConfigurations/`), Drishti's pinned Lake Python wheel already in `drishti/lib/wheels/`, `build_all.py` and checksums.
 > Unzip it and run `python build_all.py --bundle .` (needs JDK 21 and Python 3.10+, nothing else). With git installed you can instead run
 > `python clone_all.py --release <release>` from this index.
 
@@ -118,7 +118,7 @@ python build_all.py --release i7f --repo-local --skip-tests   # dedicated Maven 
 the pom trusts the Windows certificate store for the product builds (`-Djavax.net.ssl.trustStoreType=Windows-ROOT`), so a corporate
 proxy's root certificate is accepted.
 
-**In IntelliJ IDEA and PyCharm:** [IDE_GUIDE.md](IDE_GUIDE.md) takes a fresh machine from the release zip to a running server and console with nothing to edit by hand (also at the top of the zip, and placed beside `pom.xml` by `clone_all.py`). The launchers are in the parent folder's `run-configs/`:
+**In IntelliJ IDEA and PyCharm:** [IDE_GUIDE.md](IDE_GUIDE.md) takes a fresh machine from the release zip to a running server and console with nothing to edit by hand (also at the top of the zip, and placed beside `pom.xml` by `clone_all.py`). The launchers are in the parent folder's `.idea/runConfigurations/` (group **Drishti-platform 1 Build**):
 
 | Launcher | What it runs |
 |---|---|
@@ -148,7 +148,7 @@ folder>` installs from it. The script refuses, naming the requirement, when one 
 
 ## Build and run in the IDE
 
-IntelliJ and PyCharm: open the repository root; the launchers are in `run-configs/` (names start with `Platform:`). VS Code: File,
+IntelliJ and PyCharm: open the repository root; the launchers are in `.idea/runConfigurations/` (group **Drishti-platform 1 Build**, names start with `Platform:`). VS Code: File,
 Open Workspace from File, `drishti-platform.code-workspace`.
 
 ## Links

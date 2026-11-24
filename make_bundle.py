@@ -19,10 +19,19 @@ from pathlib import Path
 
 import platform_lib as pl
 
-TOP_FILES = ["README.md", "COMPATIBILITY.md", "platform.yaml", "platform_lib.py", "build_all.py", "pom.xml", "IDE_GUIDE.md", "START_HERE_WINDOWS.md", "START_HERE_WINDOWS.pdf", "LICENSE"]
+TOP_FILES = ["README.md", "COMPATIBILITY.md", "platform.yaml", "platform_lib.py", "build_all.py", "pom.xml", "IDE_GUIDE.md", "START_HERE_WINDOWS.md", "START_HERE_WINDOWS.pdf", "START_HERE_LINUX.md", "START_HERE_LINUX.pdf", "START_HERE_MACOS.md", "START_HERE_MACOS.pdf", "LICENSE"]
 
 
 archive = pl.archive
+
+
+def keep_member(path: str) -> bool:
+    """A source file goes in the zip unless it is hidden. Two hidden things are the product's own and stay: the IDE launchers
+    `.idea/runConfigurations/*.run.xml` (and nothing else of .idea) and the Maven wrapper's `.mvn/` (mvnw needs it)."""
+    parts = path.split("/")
+    if "runConfigurations" in parts and ".idea" in parts:
+        return len(parts) >= 3 and parts[-2] == "runConfigurations" and parts[-3] == ".idea" and parts[-1].endswith(".run.xml")
+    return not any(x.startswith(".") and x != ".mvn" for x in parts)
 
 
 def lake_wheel(cfg: dict, refs: dict, parent: Path) -> tuple[str, bytes] | None:
@@ -54,13 +63,13 @@ def build(cfg: dict, release: str, parent: Path, out_dir: Path) -> Path:
             prefix = cfg["repos"][name]["repo"] + "/"
             with tarfile.open(fileobj=io.BytesIO(archive(folder, ref))) as tar:
                 for m in tar.getmembers():
-                    if not m.isfile():
+                    if not m.isfile() or not keep_member(m.name):
                         continue
                     put(prefix + m.name, tar.extractfile(m).read(), m.mode)
         for f in TOP_FILES:
             put(f, (pl.HERE / f).read_bytes())
         for f in sorted((pl.HERE / "parent-run-configs").glob("*.run.xml")):   # the IntelliJ launchers, beside the pom
-            put("run-configs/" + f.name, f.read_bytes())
+            put(".idea/runConfigurations/" + f.name, f.read_bytes())
         wheel = lake_wheel(cfg, refs, parent)                                 # the pinned Lake Python wheel, where Drishti looks for it
         if wheel:
             put(*wheel)

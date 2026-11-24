@@ -44,7 +44,7 @@ def clone_or_update(cfg: dict, name: str, ref: str, parent: Path, dry: bool) -> 
 
 
 def place_pom(parent: Path, dry_run: bool) -> None:
-    """The platform pom.xml and its IntelliJ launchers (run-configs/platform-clean-install*) beside the repositories: `mvn` in the
+    """The platform pom.xml and its IntelliJ launchers (.idea/runConfigurations/platform-clean-install*) beside the repositories: `mvn` in the
     parent folder builds tools, Rachana, Lake and Drishti in order."""
     src = Path(__file__).resolve().parent / "pom.xml"
     print(f"  copy {src} -> {parent / 'pom.xml'}")
@@ -52,11 +52,12 @@ def place_pom(parent: Path, dry_run: bool) -> None:
         shutil.copyfile(src, parent / "pom.xml")
         shutil.copyfile(src.parent / "IDE_GUIDE.md", parent / "IDE_GUIDE.md")
     launchers = Path(__file__).resolve().parent / "parent-run-configs"
+    target = parent / ".idea" / "runConfigurations"
     for f in sorted(launchers.glob("*.run.xml")):
-        print(f"  copy {f} -> {parent / 'run-configs' / f.name}")
+        print(f"  copy {f} -> {target / f.name}")
         if not dry_run:
-            (parent / "run-configs").mkdir(exist_ok=True)
-            shutil.copyfile(f, parent / "run-configs" / f.name)
+            target.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(f, target / f.name)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -240,3 +240,84 @@ def test_latest_is_the_newest_released_release():
     assert pl.resolve_release(cfg, None) is None
     with pytest.raises(pl.PlatformError):
         pl.resolve_release({"releases": {"i9": {"status": "pending"}}}, "latest")
+
+
+def test_build_all_runs_the_same_maven_as_the_platform_launcher(tmp_path, monkeypatch):
+    """A zip has no git: the format check is skipped; on Windows the certificate store and py, as the pom's Windows profile."""
+    import build_all
+    (tmp_path / "mvnw").write_text("", encoding="utf-8")
+    (tmp_path / "mvnw.cmd").write_text("", encoding="utf-8")
+    monkeypatch.setattr(build_all.os, "name", "posix")
+    cmd = build_all.maven_command(tmp_path, "install", True, None)
+    assert "-Dspotless.check.skip=true" in cmd and "-DskipTests" in cmd and "-Dpython3=py" not in cmd
+    monkeypatch.setattr(build_all.os, "name", "nt")
+    cmd = build_all.maven_command(tmp_path, "install", False, None)
+    assert cmd[0].endswith("mvnw.cmd") and "-Djavax.net.ssl.trustStoreType=Windows-ROOT" in cmd and "-Dpython3=py" in cmd
+
+
+def test_the_three_start_here_pages_are_what_the_one_template_writes():
+    """START_HERE_WINDOWS/LINUX/MACOS.md come from make_start_here.py: never edited by hand, never stale; Windows never names a venv."""
+    import make_start_here
+    assert make_start_here.main(["--check"]) == 0
+    assert "venv" not in (Path(make_start_here.__file__).parent / "START_HERE_WINDOWS.md").read_text(encoding="utf-8")
+
+
+def test_launchers_go_to_the_idea_run_configurations_folder(fake, monkeypatch):
+    """F1: clone_all and make_bundle place the platform launchers in <parent>/.idea/runConfigurations (group Drishti-platform), nowhere else."""
+    tmp, cfg = fake
+    monkeypatch.setattr(pl, "load", lambda path=None: cfg)
+    parent = tmp / "parent"
+    clone_all.main(["--release", "rel", "--parent", str(parent)])
+    placed = sorted(p.name for p in (parent / ".idea" / "runConfigurations").glob("*.run.xml"))
+    assert placed == sorted(p.name for p in (pl.HERE / "parent-run-configs").glob("*.run.xml")) and placed
+    assert not (parent / "run-configs").exists()
+    for f in (parent / ".idea" / "runConfigurations").glob("*.run.xml"):
+        assert 'folderName="Drishti-platform 1 Build"' in f.read_text(encoding="utf-8")
+    for f in (pl.HERE / ".idea" / "runConfigurations").glob("*.run.xml"):
+        assert 'folderName="Drishti-platform 1 Build"' in f.read_text(encoding="utf-8")
+    with zipfile.ZipFile(make_bundle.build(cfg, "rel", parent, tmp / "out")) as z:
+        names = z.namelist()
+    assert sorted(n for n in names if n.startswith(".idea/")) == sorted(".idea/runConfigurations/" + n for n in placed)
+    assert not any(n.startswith("run-configs/") for n in names)
+
+
+def test_bundle_keeps_only_the_launchers_and_the_maven_wrapper_of_the_hidden_files():
+    keep = make_bundle.keep_member
+    assert keep("drishti/.idea/runConfigurations/Drishti server.run.xml")
+    assert keep("drishti/drishti-console/.idea/runConfigurations/Run console.run.xml")
+    assert keep("drishti/.mvn/wrapper/maven-wrapper.properties") and keep("drishti/src/A.java")
+    for bad in ("drishti/.idea/workspace.xml", "drishti/.idea/runConfigurations/notes.txt", "drishti/.idea/misc.xml", "drishti/.gitignore",
+                "drishti/.github/workflows/x.yml", "drishti/a/.hidden/f.txt", "drishti/.env"):
+        assert not keep(bad), bad
+
+
+def test_build_all_with_no_option_is_the_bundle_build(fake, monkeypatch, tmp_path, capsys):
+    """F2/D4: run from an unzipped source bundle, `build_all.py` alone builds what is beside it; a git checkout of the index does not."""
+    _, cfg = fake
+    for d in (tmp_path / "r-one" / "java", tmp_path / "r-top"):
+        d.mkdir(parents=True)
+        (d / "mvnw").write_text("")
+        (d / "mvnw.cmd").write_text("")
+    (tmp_path / "r-two").mkdir()
+    (tmp_path / "platform.yaml").write_text("x", encoding="utf-8")
+    monkeypatch.setattr(pl, "HERE", tmp_path)
+    monkeypatch.setattr(pl, "load", lambda path=None: cfg)
+    assert build_all.is_bundle(tmp_path)
+    assert build_all.main(["--dry-run", "--skip-tests"]) == 0
+    out = capsys.readouterr().out
+    assert str(tmp_path / "r-one" / "java") in out and "-DskipTests" in out
+    (tmp_path / ".git").mkdir()
+    assert not build_all.is_bundle(tmp_path)
+
+
+def test_first_run_workflow_is_valid_yaml_and_dispatch_only():
+    text = (pl.HERE / ".github" / "workflows" / "first-run.yml").read_text(encoding="utf-8")
+    assert "workflow_dispatch" in text and "pull_request" not in text and "\npush:" not in text
+    assert "windows-latest" in text and "ubuntu-latest" in text and "gh release download" in text
+    assert "@v" in text and "uses: actions/checkout" not in text
+    try:
+        import yaml
+    except ImportError:
+        return
+    doc = yaml.safe_load(text)
+    assert set(doc["jobs"]) == {"windows", "posix"} and list(doc[True]) == ["workflow_dispatch"]

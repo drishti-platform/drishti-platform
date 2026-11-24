@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Ashutosh Sinha <ajsinha@gmail.com>. All rights reserved.
 // Drishti platform. Proprietary: see LICENSE.
 //
-// Drishti platform index in VS Code: File, Open Workspace from File. Tasks and launch entries mirror run-configs/ (same names).
+// Drishti platform index in VS Code: File, Open Workspace from File. Tasks and launch entries mirror .idea/runConfigurations/ (same names).
 {
   "folders": [
     {
