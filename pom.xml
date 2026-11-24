@@ -31,7 +31,7 @@
   only runs them one after another and stops at the first that fails. A product's settings (its .mvn folder) stay its own.
   build_all.py does the same plus Elements and the Python checks.
 
-  IntelliJ: the launchers in .idea/runConfigurations/ (placed beside this file by clone_all.py, and in the source zip):
+  IntelliJ: the launchers in run-configs/ (placed beside this file by clone_all.py, and in the source zip):
       platform-clean-install                    Windows: clean install of all four, no tests, trusting the Windows certificate store
       platform-clean-install (Linux, macOS)     the same without the Windows option
   The outer Maven (the one IntelliJ runs) needs the Windows option in its own JVM, which is why the Windows launcher sets it as a VM

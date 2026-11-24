@@ -26,14 +26,10 @@ archive = pl.archive
 
 
 def keep_member(path: str) -> bool:
-    """A tracked source file goes in the zip unless it belongs to git or an IDE: `.git*` files, `.github/`, and `.idea/` except the IDE
-    launchers `.idea/runConfigurations/*.xml`. Every other file stays, hidden or not: a product's own hidden files are part of it (for example
-    the server's `capacity/template/_rels/.rels`, a part of the capacity workbook it loads at start)."""
+    """A tracked source file goes in the zip unless it belongs to git or an IDE's own folder: `.git*` files, `.github/`, `.idea/`, and `.env`
+    secrets files. Every other file stays, hidden or not (for example a product's `.mvn/` and the server's capacity template parts)."""
     parts = path.split("/")
-    if ".idea" in parts:
-        k = parts.index(".idea")
-        return len(parts) == k + 3 and parts[k + 1] == "runConfigurations" and parts[-1].endswith(".xml")
-    return not any(x in (".git", ".github", ".env") or x.startswith(".git") for x in parts)   # .env: never ship a secrets file
+    return not any(x in (".git", ".github", ".idea", ".env") or x.startswith(".git") for x in parts)
 
 def lake_wheel(cfg: dict, refs: dict, parent: Path) -> tuple[str, bytes] | None:
     """Drishti's pinned Lake wheel, built and checked against the pin (platform_lib.build_lake_wheel), placed where Drishti looks for it."""
@@ -70,7 +66,7 @@ def build(cfg: dict, release: str, parent: Path, out_dir: Path) -> Path:
         for f in TOP_FILES:
             put(f, (pl.HERE / f).read_bytes())
         for f in sorted((pl.HERE / "parent-run-configs").glob("*.run.xml")):   # the IntelliJ launchers, beside the pom
-            put(".idea/runConfigurations/" + f.name, f.read_bytes())
+            put("run-configs/" + f.name, f.read_bytes())
         wheel = lake_wheel(cfg, refs, parent)                                 # the pinned Lake Python wheel, where Drishti looks for it
         if wheel:
             put(*wheel)

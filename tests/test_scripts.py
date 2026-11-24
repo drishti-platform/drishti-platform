@@ -262,32 +262,28 @@ def test_the_three_start_here_pages_are_what_the_one_template_writes():
     assert "venv" not in (Path(make_start_here.__file__).parent / "START_HERE_WINDOWS.md").read_text(encoding="utf-8")
 
 
-def test_launchers_go_to_the_idea_run_configurations_folder(fake, monkeypatch):
-    """F1: clone_all and make_bundle place the platform launchers in <parent>/.idea/runConfigurations (group Drishti-platform), nowhere else."""
+def test_launchers_go_to_the_visible_run_configs_folder(fake, monkeypatch):
+    """Owner 11-24: no .idea anywhere; clone_all and make_bundle place the platform launchers in <parent>/run-configs (group Drishti-platform 1 Build)."""
     tmp, cfg = fake
     monkeypatch.setattr(pl, "load", lambda path=None: cfg)
     parent = tmp / "parent"
     clone_all.main(["--release", "rel", "--parent", str(parent)])
-    placed = sorted(p.name for p in (parent / ".idea" / "runConfigurations").glob("*.run.xml"))
+    placed = sorted(p.name for p in (parent / "run-configs").glob("*.run.xml"))
     assert placed == sorted(p.name for p in (pl.HERE / "parent-run-configs").glob("*.run.xml")) and placed
-    assert not (parent / "run-configs").exists()
-    for f in (parent / ".idea" / "runConfigurations").glob("*.run.xml"):
-        assert 'folderName="Drishti-platform 1 Build"' in f.read_text(encoding="utf-8")
-    for f in (pl.HERE / ".idea" / "runConfigurations").glob("*.run.xml"):
+    assert not (parent / ".idea").exists()
+    for f in [*(parent / "run-configs").glob("*.run.xml"), *(pl.HERE / "run-configs").glob("*.run.xml")]:
         assert 'folderName="Drishti-platform 1 Build"' in f.read_text(encoding="utf-8")
     with zipfile.ZipFile(make_bundle.build(cfg, "rel", parent, tmp / "out")) as z:
         names = z.namelist()
-    assert sorted(n for n in names if n.startswith(".idea/")) == sorted(".idea/runConfigurations/" + n for n in placed)
-    assert not any(n.startswith("run-configs/") for n in names)
+    assert sorted(n for n in names if n.startswith("run-configs/")) == sorted("run-configs/" + n for n in placed)
+    assert not any(".idea/" in n for n in names)
 
 
 def test_bundle_leaves_out_only_git_ide_and_secrets_files():
     keep = make_bundle.keep_member
-    assert keep("drishti/.idea/runConfigurations/Drishti server.run.xml")
-    assert keep("drishti/drishti-console/.idea/runConfigurations/Run console.run.xml")
+    assert keep("drishti/run-configs/Drishti run server.run.xml") and keep("drishti/drishti-console/run-configs/Run console.run.xml")
     assert keep("drishti/.mvn/wrapper/maven-wrapper.properties") and keep("drishti/src/A.java")
-    for bad in ("drishti/.idea/workspace.xml", "drishti/.idea/runConfigurations/notes.txt", "drishti/.idea/misc.xml", "drishti/.gitignore",
-                "drishti/.github/workflows/x.yml", "drishti/.env"):
+    for bad in ("drishti/.idea/workspace.xml", "drishti/.idea/runConfigurations/x.xml", "drishti/.gitignore", "drishti/.github/workflows/x.yml", "drishti/.env"):
         assert not keep(bad), bad
 
 
@@ -338,5 +334,5 @@ def test_the_zip_keeps_a_products_own_hidden_files():
     keep = make_bundle.keep_member
     assert keep("drishti/kernel/drishti-server/src/main/resources/capacity/template/_rels/.rels")
     assert keep("drishti/.mvn/wrapper/maven-wrapper.properties") and keep("drishti/.java-version")
-    assert keep("drishti/.idea/runConfigurations/Drishti run server.xml")
+    assert keep("drishti/run-configs/Drishti run server.run.xml")
     assert not keep("drishti/.idea/workspace.xml") and not keep("drishti/.gitignore") and not keep("drishti/.github/workflows/fast.yml")

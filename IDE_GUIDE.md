@@ -19,14 +19,14 @@ and unzip it to `C:\Users\<you>\IdeaProjects\drishti-platform\`:
 ```
 drishti-platform\
     pom.xml                 the platform pom: builds tools, Rachana, Lake, Drishti in that order
-    .idea\runConfigurations\  its IntelliJ launchers (group Drishti-platform 1 Build: platform-clean-install)
+    run-configs\  its IntelliJ launchers (group Drishti-platform 1 Build: platform-clean-install)
     IDE_GUIDE.md            this guide
     drishti\  drishti-tools\  drishti-rachana\  drishti-lake\  drishti-elements\
                             each product at its release tag; drishti\lib\wheels\ already holds the pinned Lake Python wheel
 ```
 
 With git you can instead run `py clone_all.py --release <release> --parent C:\Users\<you>\IdeaProjects\drishti-platform` from the index
-repository: it clones the same set and puts `pom.xml`, `.idea\runConfigurations\` and this guide beside it (the Lake wheel is then built once, as
+repository: it clones the same set and puts `pom.xml`, `run-configs\` and this guide beside it (the Lake wheel is then built once, as
 `drishti\lib\lake-wheel.pin` says).
 
 ## 2. Build everything (IntelliJ, window 1)
@@ -85,7 +85,7 @@ running it as a service and the QA checklist.
 
 ## 4. Work on a product's code
 
-Open each product as its own project, with its own launchers in its `.idea\runConfigurations\` (groups Drishti-java 2 Run for Drishti's IntelliJ launchers; Drishti-python 1 Setup, 2 Data, 3 Run, 4 Check for the console's PyCharm launchers):
+Open each product as its own project, with its own launchers in its `run-configs\` (groups Drishti-java 2 Run for Drishti's IntelliJ launchers; Drishti-python 1 Setup, 2 Data, 3 Run, 4 Check for the console's PyCharm launchers):
 
 | Product | IntelliJ: open | PyCharm: open | Its guide |
 |---|---|---|---|
