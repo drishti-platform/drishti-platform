@@ -116,7 +116,7 @@ jobs:
           Set-Content "$envs\dev.ini" "drishti.home=C:/old/drishti-orig`r`ndrishti.data.dir=C:/old/drishti-orig/data`r`ndrishti.python=C:/old/drishti-orig/drishti-console/.venv/Scripts/python.exe"
           Set-Content "$envs\jvm-demo.args" "`"-Djava.io.tmpdir=C:/old/drishti-orig/data/tmp/server`""
           foreach ($kv in "DRISHTI_HOME=C:\old\drishti-orig", "DRISHTI_DATA_DIR=C:\old\drishti-orig\data", "DRISHTI_TMP_DIR=C:\old\drishti-orig\data\tmp",
-                          "PIP_REQUIRE_VIRTUALENV=true", "PIP_INDEX_URL=http://127.0.0.1:9/simple", "HTTP_PROXY=http://127.0.0.1:9", "HTTPS_PROXY=http://127.0.0.1:9", "NO_PROXY=") {
+                          "DRISHTI_DISK_MINFREEGB=5", "PIP_REQUIRE_VIRTUALENV=true", "PIP_INDEX_URL=http://127.0.0.1:9/simple", "HTTP_PROXY=http://127.0.0.1:9", "HTTPS_PROXY=http://127.0.0.1:9", "NO_PROXY=") {
             $kv | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           }
 
