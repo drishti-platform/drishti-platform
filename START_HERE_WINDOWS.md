@@ -4,7 +4,7 @@
 # Start here: Drishti on Windows
 
 These steps take a Windows PC from the downloads to Drishti running in your browser. Nothing needs to be edited by hand; you type one
-line in step 4. Each step says what you should see. (`START_HERE_LINUX.md` and `START_HERE_MACOS.md` beside this file are the same steps for the other systems.)
+command in step 4. Each step says what you should see. (`START_HERE_LINUX.md` and `START_HERE_MACOS.md` beside this file are the same steps for the other systems.)
 
 ## What you need first
 
@@ -12,7 +12,7 @@ Ask your IT team to install these once, if they are not already there:
 
 - **Java 21** (a JDK), for example in `C:\Program Files\Java\jdk-21`, with `JAVA_HOME` set to that folder (or `java` on the PATH).
 - **Python 3.13** from python.org, with the **py launcher** (the standard installer includes it). Drishti uses this Python
-  itself: it never makes a virtual environment on Windows. If Python is installed for all users under `C:\Program Files`,
+  as it is: it never makes a virtual environment and never installs anything into it by itself. If Python is installed for all users under `C:\Program Files`,
   ask IT to run step 4 for you as an administrator, or use a Python installed just for you.
 - **IntelliJ IDEA** and **PyCharm** (the free Community editions are enough).
 - Step 3 needs the company network (it fetches the build tools once).
@@ -45,20 +45,27 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 4. Wait. It takes several minutes the first time.
    *You should see* `BUILD SUCCESS` at the end of the output.
 
-## 4. Prepare Python (one line, once)
+## 4. Prepare Python (once)
+
+Drishti never installs anything into your Python: you install its libraries yourself, from the wheels folder, with one command.
 
 1. Open a **Command Prompt** (press the Windows key, type `cmd`, press Enter).
-2. Type these two lines (replace `<you>` with your user name):
+2. Install the libraries (replace `<you>` with your user name):
    ```
-   cd "C:\Users\<you>\IdeaProjects\drishti-platform\drishti"
+   cd "C:\Users\<you>\IdeaProjects\drishti-platform\drishti\drishti-console"
+   py -3.13 -m pip install --no-index --find-links "C:\Users\<you>\drishti-wheels" -r requirements.txt
+   ```
+   *You should see* `Successfully installed …` (or `Requirement already satisfied`). No internet is used.
+3. Check and prepare Drishti:
+   ```
+   cd ..
    py -3.13 tools\drishti.py setup
    ```
-   It finds the libraries in `C:\Users\<you>\drishti-wheels` by itself. *You should see* a list of lines starting with `[  ok]` and, at the end,
-   **Next steps**. No internet is used. If a line says `[FAIL]`, it says what is wrong and the one line that fixes it. If you used
-   Drishti before, a line may say that your old settings were **moved** to a dated folder `replaced-<date>`: that is expected, nothing
-   is lost, and there is nothing to do.
-3. Note the path on the line that starts with `[  ok] drishti.python` (for example `C:\Users\<you>\AppData\Local\Programs\Python\Python313\python.exe`):
-   PyCharm needs it in step 5. (In PyCharm you can instead run **Drishti: setup** in the folder **Drishti-python 1 Setup**.)
+   *You should see* lines starting with `[  ok]` and, at the end, **Drishti is ready.** Setup only checks your Python; it installs
+   nothing. If a line says `[FAIL]`, it says what is wrong and the one command that fixes it. If you used Drishti before, a line may say
+   that your old settings were **moved** to a dated folder `replaced-<date>`: that is expected, nothing is lost, and there is nothing to do.
+4. Note the path on the line that starts with `[  ok] drishti.python` (for example `C:\Users\<you>\AppData\Local\Programs\Python\Python313\python.exe`):
+   PyCharm needs it in step 5. (In PyCharm, **Drishti: setup** in the folder **Drishti-python 1 Setup** runs the same check.)
 
 ## 5. Prepare the demo data (PyCharm, once)
 
@@ -98,7 +105,9 @@ The same steps from a **Command Prompt** (press the Windows key, type `cmd`, pre
 ```
 cd "C:\Users\<you>\IdeaProjects\drishti-platform"
 py -3.13 build_all.py --skip-tests
-cd "C:\Users\<you>\IdeaProjects\drishti-platform\drishti"
+cd "C:\Users\<you>\IdeaProjects\drishti-platform\drishti\drishti-console"
+py -3.13 -m pip install --no-index --find-links "C:\Users\<you>\drishti-wheels" -r requirements.txt
+cd ..
 py -3.13 tools\drishti.py setup
 py -3.13 tools\drishti.py lake demo --engine java
 py -3.13 tools\drishti.py start all --demo

@@ -26,7 +26,7 @@ OS = {
         "pack_note": "",
         "java": "**Java 21** (a JDK), for example in `C:\\Program Files\\Java\\jdk-21`, with `JAVA_HOME` set to that folder (or `java` on the PATH).",
         "python": "**Python 3.13** from python.org, with the **py launcher** (the standard installer includes it). Drishti uses this Python\n"
-                  "  itself: it never makes a virtual environment on Windows. If Python is installed for all users under `C:\\Program Files`,\n"
+                  "  as it is: it never makes a virtual environment and never installs anything into it by itself. If Python is installed for all users under `C:\\Program Files`,\n"
                   "  ask IT to run step 4 for you as an administrator, or use a Python installed just for you.",
         "python_seen": "`C:\\Users\\<you>\\AppData\\Local\\Programs\\Python\\Python313\\python.exe`",
         "interp": "**Settings → Project → Python Interpreter → Add Interpreter → Add Local Interpreter → System Interpreter**: choose the\n"
@@ -86,6 +86,7 @@ def render(key: str) -> str:
     wheels = path(o, "drishti-wheels")
     tool = f"tools{o['sep']}drishti.py"
     cd_drishti = f'cd "{drishti}"'
+    cd_console = 'cd "' + drishti + o["sep"] + 'drishti-console"'
     cd_plat = f'cd "{plat}"'
     other = [k for k in OS if k != key]
     others = " and ".join(f"`START_HERE_{k}.md`" for k in other)
@@ -93,7 +94,7 @@ def render(key: str) -> str:
 # Start here: Drishti on {o['name']}
 
 These steps take {o['pc']} from the downloads to Drishti running in your browser. Nothing needs to be edited by hand; you type one
-line in step 4. Each step says what you should see. ({others} beside this file are the same steps for the other systems.)
+command in step 4. Each step says what you should see. ({others} beside this file are the same steps for the other systems.)
 
 ## What you need first
 
@@ -132,20 +133,27 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 4. Wait. It takes several minutes the first time.
    *You should see* `BUILD SUCCESS` at the end of the output.
 
-## 4. Prepare Python (one line, once)
+## 4. Prepare Python (once)
+
+Drishti never installs anything into your Python: you install its libraries yourself, from the wheels folder, with one command.
 
 1. Open {o['terminal']}.
-2. Type these two lines (replace `<you>` with your user name):
+2. Install the libraries (replace `<you>` with your user name):
    ```
-   {cd_drishti}
+   {cd_console}
+   {o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt
+   ```
+   *You should see* `Successfully installed …` (or `Requirement already satisfied`). No internet is used.
+3. Check and prepare Drishti:
+   ```
+   cd ..
    {o['py']} {tool} setup
    ```
-   It finds the libraries in `{wheels}` by itself. *You should see* a list of lines starting with `[  ok]` and, at the end,
-   **Next steps**. No internet is used. If a line says `[FAIL]`, it says what is wrong and the one line that fixes it. If you used
-   Drishti before, a line may say that your old settings were **moved** to a dated folder `replaced-<date>`: that is expected, nothing
-   is lost, and there is nothing to do.
-3. Note the path on the line that starts with `[  ok] drishti.python` (for example {o['python_seen']}):
-   PyCharm needs it in step 5. (In PyCharm you can instead run **Drishti: setup** in the folder **Drishti-python 1 Setup**.)
+   *You should see* lines starting with `[  ok]` and, at the end, **Drishti is ready.** Setup only checks your Python; it installs
+   nothing. If a line says `[FAIL]`, it says what is wrong and the one command that fixes it. If you used Drishti before, a line may say
+   that your old settings were **moved** to a dated folder `replaced-<date>`: that is expected, nothing is lost, and there is nothing to do.
+4. Note the path on the line that starts with `[  ok] drishti.python` (for example {o['python_seen']}):
+   PyCharm needs it in step 5. (In PyCharm, **Drishti: setup** in the folder **Drishti-python 1 Setup** runs the same check.)
 
 ## 5. Prepare the demo data (PyCharm, once)
 
@@ -183,7 +191,9 @@ The same steps from {o['terminal']}, without IntelliJ IDEA or PyCharm (steps 1 a
 ```
 {cd_plat}
 {o['build_cli']}
-{cd_drishti}
+{cd_console}
+{o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt
+cd ..
 {o['py']} {tool} setup
 {o['py']} {tool} lake demo --engine java
 {o['py']} {tool} start all --demo

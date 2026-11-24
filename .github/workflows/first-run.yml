@@ -3,7 +3,7 @@
 #
 # ASSUMPTIONS (this workflow has not run yet; it cannot until all of them hold):
 #   1. Drishti i7g is released into the source zip: `tools/drishti.py doctor --acceptance` exists and prints the VAR BANK / ES figures,
-#      `setup` works without a venv, `lake demo --engine java` and `start all --demo` exist.
+#      `setup` works without a venv and installs nothing (the job installs the libraries as the owner would), `lake demo --engine java` and `start all --demo` exist.
 #   2. A (draft) release named by the input exists on this repository with the assets
 #        drishti-platform-<release>-source.zip
 #        drishti-platform-<release>-wheels-<windows-x64|linux-x64|macos-arm64>-py313.zip
@@ -89,6 +89,16 @@ jobs:
           py -3.13 build_all.py --skip-tests 2>&1 | Tee-Object "$env:OUT\build.txt"
           if ($LASTEXITCODE) { throw "build failed" }
 
+      - name: The owner installs the libraries himself (Drishti never installs anything)
+        working-directory: ${{ env.PLATFORM }}\drishti\drishti-console
+        run: |
+          $ErrorActionPreference = "Stop"
+          $wheels = "$env:USERPROFILE\drishti-wheels"
+          New-Item -ItemType Directory -Force $wheels | Out-Null
+          & "$env:SystemRoot\System32\tar.exe" -xf "$env:DL\$env:PACK" -C $wheels
+          py -3.13 -m pip install --no-index --find-links "$wheels" -r requirements.txt 2>&1 | Tee-Object "$env:OUT\owner-pip.txt"
+          if ($LASTEXITCODE) { throw "the owner's pip install from the wheel pack failed" }
+
       - name: Plant stale left-overs for every later step
         run: |
           $ErrorActionPreference = "Stop"
@@ -105,7 +115,10 @@ jobs:
         working-directory: ${{ env.PLATFORM }}\drishti
         run: |
           function Tree($d) { (Get-ChildItem -Recurse -File $d | Sort-Object FullName | ForEach-Object { $_.FullName + " " + (Get-FileHash $_.FullName).Hash }) -join "`n" }
+          $site = py -3.13 -c "import sysconfig;print(sysconfig.get_paths()['purelib'])"
+          $libs = Tree $site
           py -3.13 tools\drishti.py setup 2>&1 | Tee-Object "$env:OUT\setup-1.txt"
+          if ((Tree $site) -ne $libs) { throw "setup changed the Python's libraries: Drishti must never install" }
           if ($LASTEXITCODE) { throw "setup failed" }
           if ((Get-Content -Raw "$env:OUT\setup-1.txt") -match "127\.0\.0\.1:9") { throw "setup tried the dead package index" }
           $before = Tree "$env:USERPROFILE\drishti-envs"
@@ -202,6 +215,12 @@ jobs:
           cd "$PLATFORM"
           "$PY" build_all.py --skip-tests 2>&1 | tee "$OUT/build.txt"
 
+          # the owner installs the libraries himself (Drishti never installs anything): the pack, unzipped, then pip from requirements.txt
+          mkdir -p "$HOME/drishti-wheels" && unzip -q "$HOME/Downloads/$PACK" -d "$HOME/drishti-wheels"
+          (cd "$PLATFORM/drishti/drishti-console" && "$PY" -m pip install --no-index --find-links "$HOME/drishti-wheels" -r requirements.txt) 2>&1 | tee "$OUT/owner-pip.txt"
+          SITE="$("$PY" -c "import sysconfig;print(sysconfig.get_paths()['purelib'])")"
+          libs1="$(find "$SITE" -type f -name '*.py' -newer "$OUT/owner-pip.txt" | wc -l) $(ls "$SITE" | sha256sum)"
+
           mkdir -p "$HOME/drishti-envs"
           printf 'drishti.home=%s\ndrishti.data.dir=%s/data\ndrishti.python=%s/drishti-console/.venv/bin/python\n' "$OLD" "$OLD" "$OLD" > "$HOME/drishti-envs/dev.ini"
           export DRISHTI_HOME="$OLD" DRISHTI_DATA_DIR="$OLD/data" DRISHTI_TMP_DIR="$OLD/data/tmp" PIP_REQUIRE_VIRTUALENV=true
@@ -209,6 +228,7 @@ jobs:
 
           cd "$PLATFORM/drishti"
           "$PY" tools/drishti.py setup 2>&1 | tee "$OUT/setup-1.txt"
+          [ "$libs1" = "$(find "$SITE" -type f -name '*.py' -newer "$OUT/owner-pip.txt" | wc -l) $(ls "$SITE" | sha256sum)" ] || { echo "::error::setup changed the Python's libraries: Drishti must never install"; exit 1; }
           if grep -q '127\.0\.0\.1:9' "$OUT/setup-1.txt"; then echo "::error::setup tried the dead package index"; exit 1; fi
           tree1="$(find "$HOME/drishti-envs" -type f -exec shasum -a 256 {} + | sort -k2)"
           "$PY" tools/drishti.py setup 2>&1 | tee "$OUT/setup-2.txt"

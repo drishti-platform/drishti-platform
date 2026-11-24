@@ -4,7 +4,7 @@
 # Start here: Drishti on macOS
 
 These steps take a Mac from the downloads to Drishti running in your browser. Nothing needs to be edited by hand; you type one
-line in step 4. Each step says what you should see. (`START_HERE_WINDOWS.md` and `START_HERE_LINUX.md` beside this file are the same steps for the other systems.)
+command in step 4. Each step says what you should see. (`START_HERE_WINDOWS.md` and `START_HERE_LINUX.md` beside this file are the same steps for the other systems.)
 
 ## What you need first
 
@@ -45,20 +45,27 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 4. Wait. It takes several minutes the first time.
    *You should see* `BUILD SUCCESS` at the end of the output.
 
-## 4. Prepare Python (one line, once)
+## 4. Prepare Python (once)
+
+Drishti never installs anything into your Python: you install its libraries yourself, from the wheels folder, with one command.
 
 1. Open **Terminal** (Applications → Utilities → Terminal).
-2. Type these two lines (replace `<you>` with your user name):
+2. Install the libraries (replace `<you>` with your user name):
    ```
-   cd "/Users/<you>/IdeaProjects/drishti-platform/drishti"
+   cd "/Users/<you>/IdeaProjects/drishti-platform/drishti/drishti-console"
+   python3.13 -m pip install --no-index --find-links "/Users/<you>/drishti-wheels" -r requirements.txt
+   ```
+   *You should see* `Successfully installed …` (or `Requirement already satisfied`). No internet is used.
+3. Check and prepare Drishti:
+   ```
+   cd ..
    python3.13 tools/drishti.py setup
    ```
-   It finds the libraries in `/Users/<you>/drishti-wheels` by itself. *You should see* a list of lines starting with `[  ok]` and, at the end,
-   **Next steps**. No internet is used. If a line says `[FAIL]`, it says what is wrong and the one line that fixes it. If you used
-   Drishti before, a line may say that your old settings were **moved** to a dated folder `replaced-<date>`: that is expected, nothing
-   is lost, and there is nothing to do.
-3. Note the path on the line that starts with `[  ok] drishti.python` (for example `/Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13`):
-   PyCharm needs it in step 5. (In PyCharm you can instead run **Drishti: setup** in the folder **Drishti-python 1 Setup**.)
+   *You should see* lines starting with `[  ok]` and, at the end, **Drishti is ready.** Setup only checks your Python; it installs
+   nothing. If a line says `[FAIL]`, it says what is wrong and the one command that fixes it. If you used Drishti before, a line may say
+   that your old settings were **moved** to a dated folder `replaced-<date>`: that is expected, nothing is lost, and there is nothing to do.
+4. Note the path on the line that starts with `[  ok] drishti.python` (for example `/Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13`):
+   PyCharm needs it in step 5. (In PyCharm, **Drishti: setup** in the folder **Drishti-python 1 Setup** runs the same check.)
 
 ## 5. Prepare the demo data (PyCharm, once)
 
@@ -98,7 +105,9 @@ The same steps from **Terminal** (Applications → Utilities → Terminal), with
 ```
 cd "/Users/<you>/IdeaProjects/drishti-platform"
 python3.13 build_all.py --skip-tests
-cd "/Users/<you>/IdeaProjects/drishti-platform/drishti"
+cd "/Users/<you>/IdeaProjects/drishti-platform/drishti/drishti-console"
+python3.13 -m pip install --no-index --find-links "/Users/<you>/drishti-wheels" -r requirements.txt
+cd ..
 python3.13 tools/drishti.py setup
 python3.13 tools/drishti.py lake demo --engine java
 python3.13 tools/drishti.py start all --demo
