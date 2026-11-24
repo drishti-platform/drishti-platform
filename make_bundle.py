@@ -27,10 +27,10 @@ archive = pl.archive
 
 def keep_member(path: str) -> bool:
     """A source file goes in the zip unless it is hidden. Two hidden things are the product's own and stay: the IDE launchers
-    `.idea/runConfigurations/*.run.xml` (and nothing else of .idea) and the Maven wrapper's `.mvn/` (mvnw needs it)."""
+    `.idea/runConfigurations/*.xml` (and nothing else of .idea) and the Maven wrapper's `.mvn/` (mvnw needs it)."""
     parts = path.split("/")
     if "runConfigurations" in parts and ".idea" in parts:
-        return len(parts) >= 3 and parts[-2] == "runConfigurations" and parts[-3] == ".idea" and parts[-1].endswith(".run.xml")
+        return len(parts) >= 3 and parts[-2] == "runConfigurations" and parts[-3] == ".idea" and parts[-1].endswith(".xml")
     return not any(x.startswith(".") and x != ".mvn" for x in parts)
 
 
