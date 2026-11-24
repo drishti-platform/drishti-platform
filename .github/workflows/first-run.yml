@@ -168,7 +168,8 @@ jobs:
           if (Test-Path "C:\old") { $bad += "C:\old (the stale folder) was made" }
           $venvs = Get-ChildItem -Recurse -Force $env:PLATFORM -Include ".venv","venv","pyvenv.cfg" -ErrorAction SilentlyContinue
           if ($venvs) { $bad += "a virtual environment: " + ($venvs.FullName -join ", ") }
-          if (Select-String -Path "$env:OUT\*.txt" -Pattern "127\.0\.0\.1:9/simple|Traceback \(most recent call last\)" -List) { $bad += "a network attempt to the dead index, or a traceback, in the logs" }
+          $hits = Select-String -Path "$env:OUT\*.txt" -Pattern "127\.0\.0\.1:9/simple|Traceback \(most recent call last\)"
+          if ($hits) { $hits | ForEach-Object { $f = $_.Path; $n = $_.LineNumber; Write-Host "== $f line $n"; Get-Content $f | Select-Object -Skip ([Math]::Max(0, $n - 3)) -First 25 | ForEach-Object { Write-Host "   $_" } }; $bad += "a network attempt to the dead index, or a traceback, in the logs (printed above)" }
           if ($bad) { $bad | ForEach-Object { Write-Host "::error::$_" }; exit 1 }
 
       - name: "Gather the logs (one folder: an artifact cannot span two drives)"
