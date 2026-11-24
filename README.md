@@ -30,6 +30,19 @@ Lake as a Delta and Iceberg library in Java or Python, Tools as shared Java util
 Everything specific to a field comes as a **module**: its data shapes, measures, screens and rules. Banking risk, capital markets,
 economic data and genomics are modules today; a new field is a new module, not a new product.
 
+## Sample uses
+
+**Banking risk.** Trades and positions arrive from the trading systems a bank already runs (Endur, Calypso, Murex and others, each
+through its own source module) into one lake. Drishti computes VaR and expected shortfall by historical simulation for any scope, from
+the whole bank down to an ad-hoc set of trades, plus exposure and a pre-deal check of a trade against its limits. Every figure opens to
+its contributors, its scenarios and how it was calculated, and a playground lets a user rebuild it step by step in a spreadsheet.
+
+**Genomics.** A sample module built with the Module SDK alone and run with no finance at all, which shows the platform carries no
+domain of its own. It reads VCF files into variants, samples, genes and cohorts, and its screens include a GWAS Manhattan plot, gene
+lollipops, an oncoprint across a cohort and a protein-engineering workbench, all written as Sutras on Elements. Its data is synthetic.
+
+Other modules work the same way: capital markets, and economic and public-sector data from sources such as the World Bank and FRED.
+
 The platform is **five products, each useful on its own**, released separately and built in one order. This repository is their
 index: what each one is, which versions go together, and the scripts that fetch and build them all. No product code lives here.
 
