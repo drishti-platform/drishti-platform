@@ -53,7 +53,7 @@ Drishti never installs anything into your Python: you install its libraries your
 2. Install the libraries (replace `<you>` with your user name):
    ```
    cd "/home/<you>/IdeaProjects/drishti-platform/drishti/drishti-console"
-   python3.13 -m pip install --no-index --find-links "/home/<you>/drishti-wheels" -r requirements.txt
+   python3.13 -m pip install --no-index --find-links "/home/<you>/drishti-wheels" -r requirements.txt -r ../config/compute/locks/python.lock
    ```
    *You should see* `Successfully installed …` (or `Requirement already satisfied`). No internet is used.
 3. Check and prepare Drishti:
@@ -105,7 +105,7 @@ The same steps from a **Terminal**, without IntelliJ IDEA or PyCharm (steps 1 an
 cd "/home/<you>/IdeaProjects/drishti-platform"
 python3.13 build_all.py --skip-tests
 cd "/home/<you>/IdeaProjects/drishti-platform/drishti/drishti-console"
-python3.13 -m pip install --no-index --find-links "/home/<you>/drishti-wheels" -r requirements.txt
+python3.13 -m pip install --no-index --find-links "/home/<you>/drishti-wheels" -r requirements.txt -r ../config/compute/locks/python.lock
 cd ..
 python3.13 tools/drishti.py setup
 python3.13 tools/drishti.py lake demo --engine java

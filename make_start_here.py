@@ -86,6 +86,7 @@ def render(key: str) -> str:
     wheels = path(o, "drishti-wheels")
     tool = f"tools{o['sep']}drishti.py"
     cd_drishti = f'cd "{drishti}"'
+    lock = ".." + o["sep"] + o["sep"].join(["config", "compute", "locks", "python.lock"])
     cd_console = 'cd "' + drishti + o["sep"] + 'drishti-console"'
     cd_plat = f'cd "{plat}"'
     other = [k for k in OS if k != key]
@@ -141,7 +142,7 @@ Drishti never installs anything into your Python: you install its libraries your
 2. Install the libraries (replace `<you>` with your user name):
    ```
    {cd_console}
-   {o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt
+   {o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt -r {lock}
    ```
    *You should see* `Successfully installed …` (or `Requirement already satisfied`). No internet is used.
 3. Check and prepare Drishti:
@@ -192,7 +193,7 @@ The same steps from {o['terminal']}, without IntelliJ IDEA or PyCharm (steps 1 a
 {cd_plat}
 {o['build_cli']}
 {cd_console}
-{o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt
+{o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt -r {lock}
 cd ..
 {o['py']} {tool} setup
 {o['py']} {tool} lake demo --engine java
