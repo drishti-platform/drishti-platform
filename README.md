@@ -15,14 +15,14 @@
   <img alt="licence" src="https://img.shields.io/badge/licence-proprietary-lightgrey">
 </p>
 
-**Live, explainable analytics on the data you already have, in any domain.** Drishti reads data where it lives (Delta and Iceberg
-lakes, files, databases, streams), aggregates it on demand for any scope, from everything down to a hand-picked handful of rows, and
-explains every figure: where it came from, how it was calculated and why it moved. Screens are described, not coded, in one grammar.
-Drishti never invents a number: it shows what its sources supply and says exactly what is missing.
+**Live, explainable analytics on the data you already have.** Drishti connects to data where it lives (Delta and Iceberg lakes,
+files, databases, streams) and keeps it in one lake. It aggregates on demand for any scope, from everything down to a hand-picked
+handful of rows, and explains every figure: where it came from, how it was calculated and why it moved. Screens, reports and
+dashboards are described, not coded, in one grammar, and served to many users at once with roles, masks, four eyes and an audit trail,
+on one machine or a cluster. Drishti never invents a number: it shows what its sources supply and says exactly what is missing.
 
-What a domain needs (its data shapes, measures, screens and rules) comes as a **module**. Banking risk is the first and deepest (VaR,
-ES, exposure, the pre-deal check, connectors to trading systems); capital markets, economic and public-sector data, and genomics sit
-beside it. A new domain is a new module, not a new product.
+Everything specific to a field comes as a **module**: its data shapes, measures, screens and rules. Banking risk, capital markets,
+economic data and genomics are modules today; a new field is a new module, not a new product.
 
 The platform is **five products, each useful on its own**, released separately and built in one order. This repository is their
 index: what each one is, which versions go together, and the scripts that fetch and build them all. No product code lives here.
