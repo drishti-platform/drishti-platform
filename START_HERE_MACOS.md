@@ -16,9 +16,9 @@ Ask your IT team to install these once, if they are not already there:
 - **IntelliJ IDEA** and **PyCharm** (the free Community editions are enough).
 - Step 3 needs the company network (it fetches the build tools once).
 
-**Two programs; the launcher groups say which program and which part.** IntelliJ IDEA runs the Java side: groups **IntelliJ-platform**
-(the platform build) and **IntelliJ-drishti** (the Drishti server). PyCharm runs the Python side: group **PyCharm-console** (the console and
-the demo data). IntelliJ IDEA may also list the PyCharm groups (or show them under "Unknown"): those are for PyCharm, ignore them there.
+**Two programs; the launcher groups say which program and which part.** IntelliJ IDEA runs the Java side: groups **IntelliJ-platform-build**
+(the platform build) and **IntelliJ-drishti-build / -run / -test** (Drishti). PyCharm runs the Python side: groups **PyCharm-console-setup / -data / -run / -check** (the console
+and the demo data). IntelliJ IDEA may also list the PyCharm groups (or show them under "Unknown"): those are for PyCharm, ignore them there.
 
 ## 1. Download two files
 
@@ -42,7 +42,7 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
    If IntelliJ asks whether to trust the project, click **Trust Project**.
 2. **File → Project Structure → Project → SDK**: choose the Java 21 folder (**Add SDK → JDK…** if it is not listed). Click **OK**.
 3. Wait until the progress bar at the bottom finishes (indexing). Then, at the top right, open the list of run configurations, choose
-   **platform-clean-install** (folder **IntelliJ-platform**), and click the green **Run** arrow.
+   **platform-clean-install** (folder **IntelliJ-platform-build**), and click the green **Run** arrow.
 4. Wait. It takes several minutes the first time.
    *You should see* `BUILD SUCCESS` at the end of the output.
 
@@ -68,7 +68,7 @@ Drishti never installs anything into your Python: you install its libraries your
    nothing. If a line says `[FAIL]`, it says what is wrong and the one command that fixes it. If you used Drishti before, a line may say
    that your old settings were **moved** to a dated folder `replaced-<date>`: that is expected, nothing is lost, and there is nothing to do.
 4. Note the path on the line that starts with `[  ok] drishti.python` (for example `/Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13`):
-   PyCharm needs it in step 5. (In PyCharm, **Drishti: setup** in the folder **PyCharm-console** runs the same check.)
+   PyCharm needs it in step 5. (In PyCharm, **Drishti: setup** in the folder **PyCharm-console-setup** runs the same check.)
 
 ## 5. Prepare the demo data (PyCharm, once)
 
@@ -76,16 +76,16 @@ Drishti never installs anything into your Python: you install its libraries your
    If PyCharm offers to create a new environment, click **Cancel**: Drishti uses the Python from step 4.
 2. **Settings → Project → Python Interpreter → Add Interpreter → Add Local Interpreter**: choose the Python you noted in
    step 4 (**Select existing**). Click **OK**, and wait until the progress bar at the bottom finishes.
-3. At the top right choose **Drishti: build demo lakes** (folder **PyCharm-console**) and click **Run**.
+3. At the top right choose **Drishti: build demo lakes** (folder **PyCharm-console-data**) and click **Run**.
    *You should see* `Demo lake ready` at the end (a few minutes). Only needed the first time.
 
 ## 6. Start Drishti
 
 1. **The server (IntelliJ IDEA):** **File → Open**, choose `/Users/<you>/IdeaProjects/drishti-platform/drishti/pom.xml`, **Open as Project**, and choose
    **New Window** when asked. Trust the project, pick the same Java 21 as in step 3, and wait for the progress bar. Choose
-   **Drishti: run server (demo)** (folder **IntelliJ-drishti**) at the top right and click **Run**.
+   **Drishti: run server (demo)** (folder **IntelliJ-drishti-run**) at the top right and click **Run**.
    *You should see* `Started DrishtiApplication` after a minute or so. Leave this window open.
-2. **The console (PyCharm):** choose **Drishti: run console** (folder **PyCharm-console**) and click **Run**.
+2. **The console (PyCharm):** choose **Drishti: run console** (folder **PyCharm-console-run**) and click **Run**.
    *You should see* `Uvicorn running on http://0.0.0.0:17480`.
 3. The first time, macOS may ask whether Java and Python may accept incoming connections: click **Allow**.
 
@@ -95,7 +95,7 @@ Drishti never installs anything into your Python: you install its libraries your
 2. Sign in as `drishti-dev-admin` with the password `drishti-dev-admin123`.
 3. Type `VAR BANK` in the search box and press **GO**.
    *You should see* the bank's VaR: **167,372,692**, and ES **210,131,972**.
-4. To check everything in one click, run **acceptance** in PyCharm's folder **PyCharm-console**.
+4. To check everything in one click, run **acceptance** in PyCharm's folder **PyCharm-console-check**.
 
 ## To stop
 

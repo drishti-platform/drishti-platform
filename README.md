@@ -118,7 +118,7 @@ python build_all.py --release i7h --repo-local --skip-tests   # dedicated Maven 
 the pom trusts the Windows certificate store for the product builds (`-Djavax.net.ssl.trustStoreType=Windows-ROOT`), so a corporate
 proxy's root certificate is accepted.
 
-**In IntelliJ IDEA and PyCharm:** [IDE_GUIDE.md](IDE_GUIDE.md) takes a fresh machine from the release zip to a running server and console with nothing to edit by hand (also at the top of the zip, and placed beside `pom.xml` by `clone_all.py`). The launchers are in the parent folder's `run-configs/` (group **IntelliJ-platform**):
+**In IntelliJ IDEA and PyCharm:** [IDE_GUIDE.md](IDE_GUIDE.md) takes a fresh machine from the release zip to a running server and console with nothing to edit by hand (also at the top of the zip, and placed beside `pom.xml` by `clone_all.py`). The launchers are in the parent folder's `run-configs/` (group **IntelliJ-platform-build**):
 
 | Launcher | What it runs |
 |---|---|
@@ -148,7 +148,7 @@ folder>` installs from it. The script refuses, naming the requirement, when one 
 
 ## Build and run in the IDE
 
-IntelliJ and PyCharm: open the repository root; the launchers are in `run-configs/` (group **IntelliJ-platform**, names start with `Platform:`). VS Code: File,
+IntelliJ and PyCharm: open the repository root; the launchers are in `run-configs/` (group **IntelliJ-platform-build**, names start with `Platform:`). VS Code: File,
 Open Workspace from File, `drishti-platform.code-workspace`.
 
 ## Links

@@ -19,7 +19,7 @@ and unzip it to `C:\Users\<you>\IdeaProjects\drishti-platform\`:
 ```
 drishti-platform\
     pom.xml                 the platform pom: builds tools, Rachana, Lake, Drishti in that order
-    run-configs\  its IntelliJ launchers (group IntelliJ-platform: platform-clean-install)
+    run-configs\  its IntelliJ launchers (group IntelliJ-platform-build: platform-clean-install)
     IDE_GUIDE.md            this guide
     drishti\  drishti-tools\  drishti-rachana\  drishti-lake\  drishti-elements\
                             each product at its release tag; drishti\lib\wheels\ already holds the pinned Lake Python wheel

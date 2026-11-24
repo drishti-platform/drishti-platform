@@ -6,7 +6,7 @@
   Shared, so it is in git: copy the configuration (Ctrl+D) to change it; a pull overwrites this file.
 -->
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Platform: build all" type="PythonConfigurationType" factoryName="Python" folderName="PyCharm-platform">
+  <configuration default="false" name="Platform: build all" type="PythonConfigurationType" factoryName="Python" folderName="PyCharm-platform-build">
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />

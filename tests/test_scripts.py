@@ -263,7 +263,7 @@ def test_the_three_start_here_pages_are_what_the_one_template_writes():
 
 
 def test_launchers_go_to_the_visible_run_configs_folder(fake, monkeypatch):
-    """Owner 11-24: no .idea anywhere; clone_all and make_bundle place the platform launchers in <parent>/run-configs (group IntelliJ-platform)."""
+    """Owner 11-24: no .idea anywhere; clone_all and make_bundle place the platform launchers in <parent>/run-configs (group IntelliJ-platform-build)."""
     tmp, cfg = fake
     monkeypatch.setattr(pl, "load", lambda path=None: cfg)
     parent = tmp / "parent"
@@ -272,10 +272,10 @@ def test_launchers_go_to_the_visible_run_configs_folder(fake, monkeypatch):
     assert placed == sorted(p.name for p in (pl.HERE / "parent-run-configs").glob("*.run.xml")) and placed
     assert not (parent / ".idea").exists()
     for f in (parent / "run-configs").glob("*.run.xml"):
-        assert 'folderName="IntelliJ-platform"' in f.read_text(encoding="utf-8")
+        assert 'folderName="IntelliJ-platform-build"' in f.read_text(encoding="utf-8")
     for f in (pl.HERE / "run-configs").glob("*.run.xml"):            # the index repository's own: Python ones for PyCharm, Maven ones for IntelliJ
         t = f.read_text(encoding="utf-8")
-        assert ('folderName="PyCharm-platform"' if "PythonConfigurationType" in t else 'folderName="IntelliJ-platform"') in t
+        assert ('folderName="PyCharm-platform-' if "PythonConfigurationType" in t else 'folderName="IntelliJ-platform-build"') in t
     with zipfile.ZipFile(make_bundle.build(cfg, "rel", parent, tmp / "out")) as z:
         names = z.namelist()
     assert sorted(n for n in names if n.startswith("run-configs/")) == sorted("run-configs/" + n for n in placed)
