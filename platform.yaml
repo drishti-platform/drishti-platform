@@ -36,13 +36,13 @@ repos:
 # Per release: the tag (or branch) of each repository. "main" and "develop" are branches. A release marked pending names the tags
 # that will exist at the release; make_bundle.py refuses a tag that does not exist yet.
 releases:
-  i7h:
+  i7i:
     status: released
-    tools: v1.1.0
-    rachana: v1.0.1
-    lake: v0.9.1
-    elements: v3.3.2
-    drishti: v2.9.11.i_7h
+    tools: v1.1.0-ide1
+    rachana: v1.0.1-ide1
+    lake: v0.9.1-ide1
+    elements: v3.3.2-ide1
+    drishti: v2.9.11.i_7i
   i7b:
     status: released
     tools: v1.1.0

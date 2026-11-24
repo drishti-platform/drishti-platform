@@ -6,7 +6,7 @@ this table is its readable copy.
 
 | Platform release | Tools | Rachana | Lake | Elements | Drishti | Status |
 |---|---|---|---|---|---|---|
-| i7h | 1.1.0 (`v1.1.0`) | 1.0.1 (`v1.0.1`) | 0.9.1 (`v0.9.1`) | 3.3.2 (`v3.3.2`) | `v2.9.11.i_7h` | released 2026-11-24 |
+| i7i | 1.1.0 (`v1.1.0-ide1`) | 1.0.1 (`v1.0.1-ide1`) | 0.9.1 (`v0.9.1-ide1`) | 3.3.2 (`v3.3.2-ide1`) | `v2.9.11.i_7i` | released 2026-11-24 (launcher groups; no code change) |
 | i7b | 1.1.0 (`v1.1.0`) | 1.0.1 (`v1.0.1`) | 0.9.1 (`v0.9.1`) | 3.3.2 (`v3.3.2`) | `v2.9.11.i_7b` | released 2026-11-22 |
 
 Rules: install in the order tools, Rachana, Lake, Drishti (Elements has no Java build; Drishti vendors its bundles). A release names
