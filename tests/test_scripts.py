@@ -281,13 +281,13 @@ def test_launchers_go_to_the_idea_run_configurations_folder(fake, monkeypatch):
     assert not any(n.startswith("run-configs/") for n in names)
 
 
-def test_bundle_keeps_only_the_launchers_and_the_maven_wrapper_of_the_hidden_files():
+def test_bundle_leaves_out_only_git_ide_and_secrets_files():
     keep = make_bundle.keep_member
     assert keep("drishti/.idea/runConfigurations/Drishti server.run.xml")
     assert keep("drishti/drishti-console/.idea/runConfigurations/Run console.run.xml")
     assert keep("drishti/.mvn/wrapper/maven-wrapper.properties") and keep("drishti/src/A.java")
     for bad in ("drishti/.idea/workspace.xml", "drishti/.idea/runConfigurations/notes.txt", "drishti/.idea/misc.xml", "drishti/.gitignore",
-                "drishti/.github/workflows/x.yml", "drishti/a/.hidden/f.txt", "drishti/.env"):
+                "drishti/.github/workflows/x.yml", "drishti/.env"):
         assert not keep(bad), bad
 
 
@@ -331,3 +331,12 @@ def test_a_build_folder_with_a_space_gets_maven_a_temporary_folder_without_one(t
     assert "-Djava.io.tmpdir=" in env["MAVEN_OPTS"] and " " not in env["MAVEN_OPTS"].split("-Djava.io.tmpdir=")[1].split()[0]
     assert "MAVEN_OPTS" not in build_all.maven_env(tmp_path / "plain" / "tools", {}) or True
     assert build_all.maven_env(tmp_path / "a b", {"MAVEN_OPTS": "-Djava.io.tmpdir=/x"})["MAVEN_OPTS"] == "-Djava.io.tmpdir=/x"
+
+
+def test_the_zip_keeps_a_products_own_hidden_files():
+    """Only git's and the IDE's files are left out: the server's capacity workbook part `_rels/.rels` (loaded at start) must be in the zip."""
+    keep = make_bundle.keep_member
+    assert keep("drishti/kernel/drishti-server/src/main/resources/capacity/template/_rels/.rels")
+    assert keep("drishti/.mvn/wrapper/maven-wrapper.properties") and keep("drishti/.java-version")
+    assert keep("drishti/.idea/runConfigurations/Drishti run server.xml")
+    assert not keep("drishti/.idea/workspace.xml") and not keep("drishti/.gitignore") and not keep("drishti/.github/workflows/fast.yml")

@@ -26,13 +26,14 @@ archive = pl.archive
 
 
 def keep_member(path: str) -> bool:
-    """A source file goes in the zip unless it is hidden. Two hidden things are the product's own and stay: the IDE launchers
-    `.idea/runConfigurations/*.xml` (and nothing else of .idea) and the Maven wrapper's `.mvn/` (mvnw needs it)."""
+    """A tracked source file goes in the zip unless it belongs to git or an IDE: `.git*` files, `.github/`, and `.idea/` except the IDE
+    launchers `.idea/runConfigurations/*.xml`. Every other file stays, hidden or not: a product's own hidden files are part of it (for example
+    the server's `capacity/template/_rels/.rels`, a part of the capacity workbook it loads at start)."""
     parts = path.split("/")
-    if "runConfigurations" in parts and ".idea" in parts:
-        return len(parts) >= 3 and parts[-2] == "runConfigurations" and parts[-3] == ".idea" and parts[-1].endswith(".xml")
-    return not any(x.startswith(".") and x != ".mvn" for x in parts)
-
+    if ".idea" in parts:
+        k = parts.index(".idea")
+        return len(parts) == k + 3 and parts[k + 1] == "runConfigurations" and parts[-1].endswith(".xml")
+    return not any(x in (".git", ".github", ".env") or x.startswith(".git") for x in parts)   # .env: never ship a secrets file
 
 def lake_wheel(cfg: dict, refs: dict, parent: Path) -> tuple[str, bytes] | None:
     """Drishti's pinned Lake wheel, built and checked against the pin (platform_lib.build_lake_wheel), placed where Drishti looks for it."""
