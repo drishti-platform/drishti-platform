@@ -49,10 +49,14 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: A home folder with a space; python.org Python with py, not on the PATH
+      - name: A plain user folder, Java under Program Files (as on company PCs); python.org Python with py, not on the PATH
         run: |
           $ErrorActionPreference = "Stop"
-          $home2 = "C:\Users\John Smith"
+          # Java where company PCs have it: C:\Program Files\Java\jdk-21 (a path with a space)
+          New-Item -ItemType Directory -Force "C:\Program Files\Java" | Out-Null
+          Copy-Item -Recurse $env:JAVA_HOME "C:\Program Files\Java\jdk-21"
+          "JAVA_HOME=C:\Program Files\Java\jdk-21" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          $home2 = "C:\Users\johnsmith"
           New-Item -ItemType Directory -Force "$home2\Downloads", "$home2\IdeaProjects", "$env:RUNNER_TEMP\poison", "$env:RUNNER_TEMP\out" | Out-Null
           Invoke-WebRequest "https://www.python.org/ftp/python/$env:PY_FULL/python-$env:PY_FULL-amd64.exe" -OutFile "$env:RUNNER_TEMP\python-setup.exe"
           Start-Process -Wait "$env:RUNNER_TEMP\python-setup.exe" -ArgumentList "/quiet","InstallAllUsers=0","PrependPath=0","Include_launcher=1","Include_test=0","Include_doc=0","Include_tcltk=0"
@@ -63,7 +67,7 @@ jobs:
           }
           $keep = ($env:PATH -split ";" | Where-Object { $_ -and $_ -notmatch "\\Python|\\Git\\|\\maven" }) -join ";"
           "PATH=$env:RUNNER_TEMP\poison;$launcher;$keep" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
-          "PLATFORM=$home2\IdeaProjects\drishti-platform (1)" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "PLATFORM=$home2\IdeaProjects\drishti-platform" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           "DL=$home2\Downloads" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           "OUT=$env:RUNNER_TEMP\out" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
           "USERPROFILE=$home2" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
@@ -173,8 +177,8 @@ jobs:
           name: first-run-windows-${{ inputs.release }}
           path: |
             ${{ runner.temp }}\out
-            C:\Users\John Smith\drishti-envs
-            C:\Users\John Smith\IdeaProjects\drishti-platform (1)\drishti\data\logs
+            C:\Users\johnsmith\drishti-envs
+            C:\Users\johnsmith\IdeaProjects\drishti-platform\drishti\data\logs
           retention-days: 7
 
   posix:
@@ -204,10 +208,10 @@ jobs:
         run: |
           set -euo pipefail
           PY="$(command -v python3.13)"
-          export HOME="$RUNNER_TEMP/John Smith"
+          export HOME="$RUNNER_TEMP/johnsmith"
           OUT="$RUNNER_TEMP/out"
           OLD="$RUNNER_TEMP/old/drishti-orig"
-          PLATFORM="$HOME/IdeaProjects/drishti-platform (1)"
+          PLATFORM="$HOME/IdeaProjects/drishti-platform"
           mkdir -p "$HOME/Downloads" "$PLATFORM" "$OUT"
           gh release download "$REL" --repo "$GITHUB_REPOSITORY" --dir "$HOME/Downloads" \
              --pattern "drishti-platform-$REL-source.zip" --pattern "$PACK"
@@ -270,6 +274,6 @@ jobs:
           name: first-run-${{ matrix.target }}-${{ inputs.release }}
           path: |
             ${{ runner.temp }}/out
-            ${{ runner.temp }}/John Smith/drishti-envs
-            ${{ runner.temp }}/John Smith/IdeaProjects/drishti-platform (1)/drishti/data/logs
+            ${{ runner.temp }}/johnsmith/drishti-envs
+            ${{ runner.temp }}/johnsmith/IdeaProjects/drishti-platform/drishti/data/logs
           retention-days: 7
