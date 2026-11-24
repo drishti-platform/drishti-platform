@@ -249,10 +249,10 @@ def test_build_all_runs_the_same_maven_as_the_platform_launcher(tmp_path, monkey
     (tmp_path / "mvnw.cmd").write_text("", encoding="utf-8")
     monkeypatch.setattr(build_all.os, "name", "posix")
     cmd = build_all.maven_command(tmp_path, "install", True, None)
-    assert "-Dspotless.check.skip=true" in cmd and "-DskipTests" in cmd and "-Dpython3=py" not in cmd
+    assert "-Dspotless.check.skip=true" in cmd and "-DskipTests" in cmd and f"-Dpython3={sys.executable}" in cmd
     monkeypatch.setattr(build_all.os, "name", "nt")
     cmd = build_all.maven_command(tmp_path, "install", False, None)
-    assert cmd[0].endswith("mvnw.cmd") and "-Djavax.net.ssl.trustStoreType=Windows-ROOT" in cmd and "-Dpython3=py" in cmd
+    assert cmd[0].endswith("mvnw.cmd") and "-Djavax.net.ssl.trustStoreType=Windows-ROOT" in cmd and f"-Dpython3={sys.executable}" in cmd
 
 
 def test_the_three_start_here_pages_are_what_the_one_template_writes():

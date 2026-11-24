@@ -46,8 +46,9 @@ def maven_command(build_dir: Path, goal: str, skip_tests: bool, repo_local: Path
     if not wrapper.is_file():
         raise pl.PlatformError(f"{wrapper} not found (is the repository complete?)")
     cmd = [str(wrapper), "-B", "clean", goal, "-Dspotless.check.skip=true"]   # as the platform pom: a zip has no git for the format check
-    if os.name == "nt":                     # as the pom's Windows profile: the company proxy's root certificate, and py (not the Store stub)
-        cmd += ["-Djavax.net.ssl.trustStoreType=Windows-ROOT", "-Dpython3=py"]
+    cmd.append(f"-Dpython3={sys.executable}")  # Rachana's build runs a small Python step: the Python running this script, never a bare python3 on the PATH
+    if os.name == "nt":                     # as the pom's Windows profile: the company proxy's root certificate
+        cmd.append("-Djavax.net.ssl.trustStoreType=Windows-ROOT")
     if skip_tests:
         cmd.append("-DskipTests")
     if repo_local:
