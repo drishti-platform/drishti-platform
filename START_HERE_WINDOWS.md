@@ -47,13 +47,15 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 
 ## 4. Prepare Python (once)
 
-Drishti never installs anything into your Python: you install its libraries yourself, from the wheels folder, with one command.
+Drishti never installs anything into your Python: you install its libraries yourself, from the wheels folder, with two commands
+(the console's libraries, then the server's compute libraries).
 
 1. Open a **Command Prompt** (press the Windows key, type `cmd`, press Enter).
 2. Install the libraries (replace `<you>` with your user name):
    ```
    cd "C:\Users\<you>\IdeaProjects\drishti-platform\drishti\drishti-console"
-   py -3.13 -m pip install --no-index --find-links "C:\Users\<you>\drishti-wheels" -r requirements.txt -r ..\config\compute\locks\python.lock
+   py -3.13 -m pip install --no-index --find-links "C:\Users\<you>\drishti-wheels" -r requirements.txt
+   py -3.13 -m pip install --no-index --find-links "C:\Users\<you>\drishti-wheels" -r ..\config\compute\locks\python.lock
    ```
    *You should see* `Successfully installed …` (or `Requirement already satisfied`). No internet is used.
 3. Check and prepare Drishti:
@@ -106,7 +108,8 @@ The same steps from a **Command Prompt** (press the Windows key, type `cmd`, pre
 cd "C:\Users\<you>\IdeaProjects\drishti-platform"
 py -3.13 build_all.py --skip-tests
 cd "C:\Users\<you>\IdeaProjects\drishti-platform\drishti\drishti-console"
-py -3.13 -m pip install --no-index --find-links "C:\Users\<you>\drishti-wheels" -r requirements.txt -r ..\config\compute\locks\python.lock
+py -3.13 -m pip install --no-index --find-links "C:\Users\<you>\drishti-wheels" -r requirements.txt
+py -3.13 -m pip install --no-index --find-links "C:\Users\<you>\drishti-wheels" -r ..\config\compute\locks\python.lock
 cd ..
 py -3.13 tools\drishti.py setup
 py -3.13 tools\drishti.py lake demo --engine java

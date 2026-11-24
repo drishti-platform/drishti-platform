@@ -136,13 +136,15 @@ From the release page (<https://github.com/drishti-platform/drishti-platform/rel
 
 ## 4. Prepare Python (once)
 
-Drishti never installs anything into your Python: you install its libraries yourself, from the wheels folder, with one command.
+Drishti never installs anything into your Python: you install its libraries yourself, from the wheels folder, with two commands
+(the console's libraries, then the server's compute libraries).
 
 1. Open {o['terminal']}.
 2. Install the libraries (replace `<you>` with your user name):
    ```
    {cd_console}
-   {o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt -r {lock}
+   {o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt
+   {o['py']} -m pip install --no-index --find-links "{wheels}" -r {lock}
    ```
    *You should see* `Successfully installed …` (or `Requirement already satisfied`). No internet is used.
 3. Check and prepare Drishti:
@@ -193,7 +195,8 @@ The same steps from {o['terminal']}, without IntelliJ IDEA or PyCharm (steps 1 a
 {cd_plat}
 {o['build_cli']}
 {cd_console}
-{o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt -r {lock}
+{o['py']} -m pip install --no-index --find-links "{wheels}" -r requirements.txt
+{o['py']} -m pip install --no-index --find-links "{wheels}" -r {lock}
 cd ..
 {o['py']} {tool} setup
 {o['py']} {tool} lake demo --engine java
