@@ -92,4 +92,4 @@ Every launcher is a command; Drishti can show and run them from the launcher fil
 | VaR: *not enough free disk* | under 20 GB free | free space, or `drishti.disk.min-free-gb=10` in `dev.ini` |
 
 Every `[FAIL]` line ends with `Fix:` and the command to run. Drishti's own guide, `drishti\docs\guides\IDE_GUIDE.md`, has every launcher
-in detail; running Drishti for real users on a Linux server: `drishti\docs\PRODUCTION_DEPLOYMENT.md`.
+in detail; running Drishti for real users on a Linux server: `drishti\docs\guides\OPERATIONS_GUIDE.md`, section "Production deployment (Linux)".

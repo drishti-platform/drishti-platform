@@ -230,7 +230,7 @@ Setup's `[FAIL]` lines, the ones people meet most:
 
 Otherwise take a photo or screenshot of the whole window and send it to your Drishti contact. The step number above helps. More detail for
 technical readers: `IDE_GUIDE.md` (beside this file) and `drishti{o['sep']}docs{o['sep']}guides{o['sep']}IDE_GUIDE.md`. Running Drishti
-for real users on a server: `drishti{o['sep']}docs{o['sep']}PRODUCTION_DEPLOYMENT.md` (Linux).
+for real users on a server: `drishti{o['sep']}docs{o['sep']}guides{o['sep']}OPERATIONS_GUIDE.md`, section "Production deployment (Linux)".
 """
 
 

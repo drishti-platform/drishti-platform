@@ -132,7 +132,7 @@ py -3.13 tools\drishti.py doctor --acceptance                        # PASS: VaR
 Open `http://localhost:17480` (sign in `drishti-dev-admin` / `drishti-dev-admin123`). Drishti never creates a Python environment and
 never installs packages: the two pip lines are yours, into the Python you choose (use one just for Drishti if other work shares it).
 The same steps in IntelliJ IDEA and PyCharm, with what you should see at each step: `START_HERE_*.pdf` and [IDE_GUIDE.md](IDE_GUIDE.md).
-Running Drishti for real users (Linux): `drishti/docs/PRODUCTION_DEPLOYMENT.md`.
+Running Drishti for real users (Linux): `drishti/docs/guides/OPERATIONS_GUIDE.md`, section "Production deployment (Linux)".
 
 ## IDE launchers
 
