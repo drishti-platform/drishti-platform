@@ -8,7 +8,7 @@
 <i>Your data is a treasury;</i> <b>Drishti is its sentinel.</b></p>
 
 <p align="center">
-  <a href="COMPATIBILITY.md"><img alt="platform release" src="https://img.shields.io/badge/platform-i7m-1f6feb"></a>
+  <a href="COMPATIBILITY.md"><img alt="platform release" src="https://img.shields.io/badge/platform-i7n-1f6feb"></a>
   <img alt="Java 21" src="https://img.shields.io/badge/Java-21-orange">
   <img alt="Python 3.13" src="https://img.shields.io/badge/Python-3.13-3776ab">
   <img alt="Windows | Linux | macOS" src="https://img.shields.io/badge/runs%20on-Windows%20%7C%20Linux%20%7C%20macOS-555">
