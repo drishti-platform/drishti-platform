@@ -42,6 +42,9 @@ def built(tmp_path):
     _w(d / "tools" / "test_x.py", "test: never")
     _w(d / "tools" / "__pycache__" / "x.pyc", "pyc")
     _w(d / "tools" / "bench" / "scale.sh", "bench")
+    _w(d / "tools" / "bench" / "trades.py", "runtime: shipped")
+    _w(d / "tools" / "dev" / "bicompute_unit.py", "runtime: shipped")
+    _w(d / "tools" / "drillkit" / "drill_plan.py", "never")
     _w(d / "drishti-console" / "run_drishti_web.py", "console")
     _w(d / "drishti-console" / "tests" / "t.py", "tests")
     _w(d / "deploy" / "systemd" / "drishti-server.service", "[Unit]")
@@ -74,12 +77,12 @@ def test_contents_and_exclusions(built, wheels, tmp_path):
     top = "drishti-rel-linux-x64/"
     for must in ("drishti/lib/drishti-server-9.9.9-exec.jar", "drishti/lib/lake-wheel.pin", "drishti/lib/ext/README.txt",
                  "drishti/lib/wheels/drishti_lake-0.9.1-py3-none-any.whl", "drishti/modules/banking-1.0.0.dmod", "drishti/modules/first-party.yaml",
-                 "drishti/config/app.yaml", "drishti/tools/drishti.py", "drishti/drishti-console/run_drishti_web.py",
+                 "drishti/config/app.yaml", "drishti/tools/drishti.py", "drishti/tools/bench/trades.py", "drishti/tools/dev/bicompute_unit.py", "drishti/drishti-console/run_drishti_web.py",
                  "drishti/deploy/systemd/drishti-server.service", "drishti/docs/guides/G.md", "drishti/LICENSE",
                  "wheels/requirements.txt", "wheels/python.lock", "wheels/numpy-2.0-cp313-manylinux.whl",
                  "MANIFEST.json", "SHA256SUMS", "INSTALL.md", "verify_package.py"):
         assert top + must in names, must
-    for never in ("lib/drishti-server-exec.jar", "modules/banking/src/A.java", "tools/test_x.py", "tools/__pycache__/x.pyc", "tools/bench/scale.sh",
+    for never in ("lib/drishti-server-exec.jar", "modules/banking/src/A.java", "tools/test_x.py", "tools/__pycache__/x.pyc", "tools/bench/scale.sh", "tools/drillkit/drill_plan.py",
                   "drishti-console/tests/t.py", "deploy/aws/x.tf", "docs/publications/deck.pptx", "data/testdata/big.jsonl.gz", "kernel/A.java"):
         assert top + "drishti/" + never not in names, never
 

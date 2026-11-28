@@ -49,10 +49,10 @@ JAVA_MIN = 21
 TOP_FILES = ["LICENSE", "THIRD-PARTY-NOTICES.md", "README.md", "RELEASE_NOTES.md", "CHANGELOG.md", "HOW_IT_FITS.md", "HOW_IT_FITS.pdf"]
 TOP_DIRS = ["config", "tools", "drishti-console", "deploy", "docs", "clients"]
 # patterns (matched on the path relative to the Drishti folder, and on each path part) that never ship
-EXCLUDE_PARTS = {"__pycache__", ".pytest_cache", "node_modules", "tests", "bench", "run-configs", "mockups", "publications", ".git",
+EXCLUDE_PARTS = {"__pycache__", ".pytest_cache", "node_modules", "tests", "run-configs", "mockups", "publications", ".git",
                  ".idea", ".mvn", "target", "aws", "docker"}
 EXCLUDE_NAMES = ["secrets.env", "secrets.ini", "*.pyc", "test_*.py", "*_test.py", "conftest.py", ".git*", ".env", "*.iml", "drill*.txt", "drill*.sh"]
-EXCLUDE_PATHS = ["tools/dev/*", "tools/drillkit/*", "tools/browser/*", "docs/lenses/mockups/*"]
+EXCLUDE_PATHS = ["tools/drillkit/*", "tools/bench/results/*", "tools/bench/*.sh", "docs/lenses/mockups/*"]   # tools/dev, browser and bench code stay: drishti.py loads them
 
 
 class BinaryError(pl.PlatformError):
